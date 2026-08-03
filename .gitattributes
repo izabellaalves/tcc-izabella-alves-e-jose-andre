@@ -1,0 +1,24 @@
+# Garantir line endings corretos independente do sistema operacional
+
+# Scripts shell sempre com LF (Unix)
+*.sh text eol=lf
+*.pl text eol=lf
+
+# Scripts Defects4J (sem extensão) com LF
+defects4j/framework/bin/* text eol=lf
+
+# Scripts Python sempre com LF
+*.py text eol=lf
+
+# Arquivos de configuração com LF
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+.dockerignore text eol=lf
+
+# Documentação pode usar sistema nativo
+*.md text
+*.txt text
+
+# Binários
+*.class binary
+*.jar binary

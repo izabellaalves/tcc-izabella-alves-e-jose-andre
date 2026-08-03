@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  tcc-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tcc-feature-engineering:latest
+    container_name: tcc-pipeline
+    
+    # Mapear diretórios para persistência
+    volumes:
+      - ./data:/app/data           # Persiste checkouts e features.csv
+      - ./logs:/app/logs           # Persiste logs de execução
+      
+    # Variáveis de ambiente
+    environment:
+      - TZ=America/Los_Angeles
+      - PYTHONUNBUFFERED=1         # Output em tempo real
+      
+    # Configurações de recursos (ajuste conforme sua máquina)
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+    
+    # Restart policy
+    restart: "no"
+    
+    # Comando pode ser sobrescrito
+    # docker-compose run tcc-pipeline python3 scripts/prepare_dataset.py --debug
+    command: python3 scripts/prepare_dataset.py
+
+  # Serviço alternativo para execução interativa/debug
+  tcc-shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tcc-feature-engineering:latest
+    container_name: tcc-shell
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - TZ=America/Los_Angeles
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+    profiles:
+      - debug
