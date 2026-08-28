@@ -1,0 +1,15 @@
+{
+  "best_params": {
+    "max_depth": null,
+    "min_samples_leaf": 1,
+    "min_samples_split": 2,
+    "n_estimators": 100
+  },
+  "cv_best_f1": 0.019671126854911535,
+  "scoring": "f1",
+  "cv": "StratifiedKFold(5, shuffle, seed=42)",
+  "fixed_params": {
+    "class_weight": "balanced",
+    "random_state": 42
+  }
+}

@@ -1,0 +1,4 @@
+comparison,wilcoxon_statistic,p_value,significant_p<0.05,n_pairs
+Random vs History-based,131.0,0.3966787576604369,False,26
+Random vs Random Forest,102.0,0.10355284372800362,False,26
+History-based vs Random Forest,17.0,0.15485982528200376,False,26
