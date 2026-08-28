@@ -33,8 +33,8 @@ Thumbs.db
 # Docker
 .dockerignore
 
-# Defects4J project repos (baixados pelo init.sh)
-defects4j/project_repos/
+# Defects4J (clonado localmente para o build do Docker; não versionado)
+defects4j/
 
 # Jupyter
 .ipynb_checkpoints/

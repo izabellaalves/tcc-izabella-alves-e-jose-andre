@@ -1,0 +1,27 @@
+project,bug,History-based,Random,Random Forest,best_strategy,worst_strategy
+Chart,3,0.657,0.4473,0.657,History-based / Random Forest,Random
+Chart,5,0.8545,0.496,0.9264,Random Forest,Random
+Chart,7,0.4062,0.4396,0.4062,Random,History-based / Random Forest
+Chart,9,0.8047,0.5099,0.8359,Random Forest,Random
+Chart,10,0.5,0.5,0.5,Random / History-based / Random Forest,Random / History-based / Random Forest
+Chart,12,0.694,0.4502,0.8035,Random Forest,Random
+Chart,14,0.2592,0.8243,0.3015,Random,History-based
+Chart,19,0.4467,0.6769,0.5068,Random,History-based
+Lang,8,0.9152,0.5568,0.9152,History-based / Random Forest,Random
+Lang,10,0.6331,0.4978,0.6331,History-based / Random Forest,Random
+Lang,21,0.7026,0.5083,0.7026,History-based / Random Forest,Random
+Lang,22,0.18,0.724,0.18,Random,History-based / Random Forest
+Lang,24,0.7227,0.4394,0.35,History-based,Random Forest
+Lang,29,0.5361,0.5,0.252,History-based,Random Forest
+Lang,30,0.9115,0.9085,0.7294,History-based,Random Forest
+Lang,32,0.1222,0.5133,0.1222,Random,History-based / Random Forest
+Lang,33,0.2059,0.4915,0.1431,Random,Random Forest
+Lang,34,0.3812,0.9706,0.1986,Random,Random Forest
+Lang,36,0.8591,0.6467,0.3682,History-based,Random Forest
+Lang,42,0.6759,0.5333,0.6759,History-based / Random Forest,Random
+Lang,44,0.375,0.3783,0.375,Random,History-based / Random Forest
+Lang,50,0.1857,0.7381,0.1857,Random,History-based / Random Forest
+Lang,56,0.4394,0.4949,0.4394,Random,History-based / Random Forest
+Lang,61,0.4351,0.5971,0.4351,Random,History-based / Random Forest
+Lang,63,0.3438,0.575,0.3438,Random,History-based / Random Forest
+Lang,65,0.05,0.5467,0.05,Random,History-based / Random Forest
