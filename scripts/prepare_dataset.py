@@ -36,13 +36,18 @@ Exemplos:
     parser.add_argument(
         "--projects",
         type=str,
-        default="Lang,Chart",
-        help="Projetos a processar, separados por vírgula (padrão: Lang,Chart)",
+        default="Lang,Chart,Math,Time,Mockito,Compress",
+        help="Projetos a processar, separados por vírgula (padrão: Lang,Chart,Math,Time,Mockito,Compress)",
     )
     parser.add_argument(
         "--skip-checkout",
         action="store_true",
         help="Pular checkout se bugs já existirem em data/",
+    )
+    parser.add_argument(
+        "--skip-to-features",
+        action="store_true",
+        help="Pular direto para cálculo de features usando intermediate.csv existente",
     )
     parser.add_argument(
         "--debug",
@@ -81,6 +86,7 @@ def main():
     logger.info("Início: %s", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     logger.info("Projetos: %s", ", ".join(p.strip() for p in args.projects.split(",")))
     logger.info("Skip checkout: %s", args.skip_checkout)
+    logger.info("Skip to features: %s", args.skip_to_features)
     logger.info("Diretório de dados: %s", data_dir)
     logger.info("Arquivo de saída: %s", output_path)
     logger.info("")
@@ -90,6 +96,75 @@ def main():
     total_timer.__enter__()
 
     try:
+        if args.skip_to_features:
+            logger.info("=" * 80)
+            logger.info("MODO RÁPIDO: Pulando para Cálculo de Features")
+            logger.info("=" * 80)
+            
+            intermediate_path = DATA_INTERMEDIATE_DIR / "intermediate.csv"
+            
+            if not intermediate_path.exists():
+                logger.error("Arquivo intermediate.csv não encontrado: %s", intermediate_path)
+                logger.error("Execute primeiro sem --skip-to-features para gerar o arquivo")
+                return 1
+            
+            logger.info("Carregando %s", intermediate_path)
+            import pandas as pd
+            df_intermediate = pd.read_csv(intermediate_path)
+            logger.info("Carregado: %d linhas", len(df_intermediate))
+            logger.info("")
+            
+            try:
+                config = validate_environment()
+            except RuntimeError as e:
+                logger.error("Erro de ambiente: %s", e)
+                return 1
+            
+            feature_engineer = FeatureEngineer(config)
+            
+            logger.info("=" * 80)
+            logger.info("ETAPA 6: Cálculo de Features")
+            logger.info("=" * 80)
+
+            with Timer() as t:
+                df_features = feature_engineer.calculate_features(
+                    df_intermediate,
+                    [],
+                    {},
+                )
+
+            logger.info("Features calculadas em %s", format_duration(t.elapsed))
+            logger.info("")
+            
+            logger.info("=" * 80)
+            logger.info("ETAPA 7: Validação de Features")
+            logger.info("=" * 80)
+
+            if not feature_engineer.validate_features(df_features):
+                logger.error("Validação de features falhou")
+                return 1
+
+            logger.info("")
+
+            logger.info("=" * 80)
+            logger.info("ETAPA 8: Estatísticas Finais")
+            logger.info("=" * 80)
+
+            feature_engineer.print_statistics(df_features)
+
+            DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+            df_features.to_csv(output_path, index=False)
+
+            logger.info("")
+            logger.info("=" * 80)
+            logger.info("Pipeline Finalizado (MODO RÁPIDO)")
+            logger.info("=" * 80)
+            logger.info("Arquivo salvo: %s", output_path)
+            logger.info("Linhas: %d", len(df_features))
+            logger.info("Tempo total: %s", format_duration(total_timer.elapsed))
+            
+            return 0
+
         logger.info("=" * 80)
         logger.info("ETAPA 1: Validação do Ambiente")
         logger.info("=" * 80)
@@ -163,7 +238,7 @@ def main():
         logger.info("ETAPA 5: Construção da Tabela Intermediária")
         logger.info("=" * 80)
 
-        feature_engineer = FeatureEngineer()
+        feature_engineer = FeatureEngineer(config)
 
         with Timer() as t:
             df_intermediate = feature_engineer.build_intermediate_table(
@@ -184,7 +259,11 @@ def main():
         logger.info("=" * 80)
 
         with Timer() as t:
-            df_features = feature_engineer.calculate_features(df_intermediate)
+            df_features = feature_engineer.calculate_features(
+                df_intermediate,
+                metadatas,
+                test_methods_dict,
+            )
 
         logger.info("Features calculadas em %s", format_duration(t.elapsed))
         logger.info("")
@@ -227,6 +306,22 @@ def main():
 
         if not validation_passed:
             logger.warning("Algumas validações falharam, mas o arquivo foi gerado")
+
+        logger.info("")
+
+        logger.info("=" * 80)
+        logger.info("ETAPA 11: Validação da Feature history_detection")
+        logger.info("=" * 80)
+
+        from validate_history_feature import HistoryValidator
+
+        history_validator = HistoryValidator(output_path)
+        history_validation_passed = history_validator.run_all_validations()
+
+        if not history_validation_passed:
+            logger.error("VALIDAÇÃO DE HISTORY FALHOU!")
+            logger.error("O dataset NÃO está pronto para treinamento.")
+            return 1
 
         logger.info("")
 

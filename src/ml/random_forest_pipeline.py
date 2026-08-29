@@ -23,15 +23,24 @@ from src.metrics.apfd import calculate_apfd
 CSV_PATH = "data/processed/features.csv"
 RESULTS_DIR = Path("results")
 
-# Seed fixa da metodologia (TCC1) para o split por bug — garante reprodutibilidade.
 SPLIT_SEED = 42
-FEATURES = ["history", "same_package", "modified_classes_count"]
+FEATURES = [
+    "history",
+    "same_package",
+    "modified_classes_count",
+    "historical_failure_rate",
+    "last_failure_distance",
+    "test_name_similarity",
+]
 
-# Tamanhos alvo do split (definidos na metodologia do TCC1).
-# Lang-1 não tem trigger test (APFD indefinido), então entra FIXO no treino;
-# os demais 60 bugs de Lang são sorteados em 42 treino + 18 teste.
-SPLIT_PLAN = {"Lang": {"train": 43, "test": 18, "fixed_train": [1]},
-              "Chart": {"train": 18, "test": 8, "fixed_train": []}}
+SPLIT_PLAN = {
+    "Lang": {"train": 41, "test": 17, "fixed_train": [1]},
+    "Chart": {"train": 18, "test": 8, "fixed_train": []},
+    "Math": {"train": 71, "test": 31, "fixed_train": []},
+    "Time": {"train": 18, "test": 7, "fixed_train": []},
+    "Mockito": {"train": 22, "test": 9, "fixed_train": []},
+    "Compress": {"train": 32, "test": 14, "fixed_train": []},
+}
 
 
 def make_split(df: pd.DataFrame) -> dict:
@@ -71,7 +80,7 @@ def train(df_train: pd.DataFrame, scoring: str = "f1", suffix: str = "") -> tupl
     search = GridSearchCV(
         RandomForestClassifier(class_weight="balanced", random_state=42, n_jobs=-1),
         param_grid,
-        scoring=scoring,  # métrica robusta ao desbalanceamento (positivos ~1,3%)
+        scoring=scoring,
         cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=42),
         n_jobs=-1,
     )
@@ -133,7 +142,6 @@ def summary(rf: pd.DataFrame, split: dict):
         base = base[base.apply(lambda r: (r["project"], r["bug"]) in test_pairs, axis=1)]
         print(f"  {name:<8} {stats(base[col])}")
     print(f"  {'RF':<8} {stats(rf['apfd'])}")
-    print("\nReferência (todos os 86 bugs válidos): Random=0.5750, History=0.5667.")
 
 
 def run(scoring: str = "f1"):

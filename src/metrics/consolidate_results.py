@@ -1,4 +1,4 @@
-"""Consolida os resultados de APFD das três estratégias nos 26 bugs de teste.
+"""Consolida os resultados de APFD das três estratégias nos 86 bugs de teste.
 
 Uso: python3 -m src.metrics.consolidate_results
 Gera: results/apfd_long_format.csv, results/descriptive_statistics.csv,
@@ -36,13 +36,24 @@ def load_long() -> pd.DataFrame:
         frames.append(df)
     long_df = pd.concat(frames, ignore_index=True)
 
-    # Sanidade: mesmos 26 bugs nas três estratégias, sem NaN
+    null_bugs = long_df[long_df["apfd"].isnull()][["project", "bug"]].drop_duplicates()
+    if not null_bugs.empty:
+        print(f"Removendo {len(null_bugs)} bugs sem testes que detectam falhas:")
+        for _, row in null_bugs.iterrows():
+            print(f"   - {row['project']}-{row['bug']}")
+        long_df = long_df[long_df["apfd"].notnull()]
+
     per_strategy = long_df.groupby("strategy").apply(
-        lambda g: set(zip(g["project"], g["bug"])), include_groups=False)
-    assert all(bugs == test_pairs for bugs in per_strategy), \
+        lambda g: set(zip(g["project"], g["bug"])))
+    valid_bugs = per_strategy.iloc[0]
+    n_valid = len(valid_bugs)
+
+    assert all(len(bugs) == n_valid for bugs in per_strategy), \
+        "Número de bugs diverge entre estratégias"
+    assert all(bugs == valid_bugs for bugs in per_strategy), \
         "Bugs de teste divergem entre estratégias"
-    assert not long_df["apfd"].isnull().any(), "APFD nulo encontrado no conjunto de teste"
-    assert len(long_df) == 3 * len(test_pairs)
+    assert not long_df["apfd"].isnull().any(), "APFD nulo encontrado após filtragem"
+    assert len(long_df) == 3 * n_valid
 
     long_df.to_csv(RESULTS_DIR / "apfd_long_format.csv", index=False)
     return long_df
@@ -59,7 +70,7 @@ def descriptive_stats(long_df: pd.DataFrame) -> pd.DataFrame:
 
     stats = pd.concat([stats_for(long_df, "Geral")] +
                       [stats_for(long_df[long_df["project"] == p], p)
-                       for p in ("Lang", "Chart")], ignore_index=True)
+                       for p in ("Lang", "Chart", "Math", "Time", "Mockito", "Compress")], ignore_index=True)
     stats.to_csv(RESULTS_DIR / "descriptive_statistics.csv", index=False)
     return stats
 

@@ -45,7 +45,7 @@ class TestEnumerator:
     def run_javap(self, class_name: str, bin_dir: Path) -> Optional[str]:
         try:
             result = subprocess.run(
-                ["javap", "-public", "-cp", str(bin_dir), class_name],
+                ["javap", "-v", "-cp", str(bin_dir), class_name],
                 capture_output=True,
                 text=True,
                 timeout=30,
@@ -78,26 +78,43 @@ class TestEnumerator:
         test_methods = []
         lines = javap_output.split("\n")
 
-        for i, line in enumerate(lines):
-            line = line.strip()
-
-            has_test_annotation = False
-            if i > 0 and re.search(r"@.*Test\b", lines[i - 1].strip()):
-                has_test_annotation = True
+        i = 0
+        while i < len(lines):
+            line = lines[i].strip()
 
             method_match = re.match(
                 r"public\s+(?:void|[\w.<>]+)\s+(\w+)\s*\(",
                 line,
             )
 
-            if not method_match:
-                continue
+            if method_match:
+                method_name = method_match.group(1)
 
-            method_name = method_match.group(1)
+                if method_name.startswith("test"):
+                    test_methods.append(method_name)
+                    self.logger.debug("Método de teste encontrado: %s (prefixo test)", method_name)
+                else:
+                    has_test_annotation = False
+                    for j in range(i + 1, min(i + 100, len(lines))):
+                        check_line = lines[j].strip()
+                        if "RuntimeVisibleAnnotations:" in check_line:
+                            for k in range(j + 1, min(j + 10, len(lines))):
+                                annotation_line = lines[k].strip()
+                                lower_annotation = annotation_line.lower()
+                                if ("org/junit" in lower_annotation or "org.junit" in lower_annotation) and "test" in lower_annotation:
+                                    has_test_annotation = True
+                                    break
+                                if not annotation_line or (annotation_line and not annotation_line[0].isdigit() and not annotation_line.startswith("#") and "org" not in lower_annotation):
+                                    break
+                            break
+                        if (check_line.startswith("public ") or check_line.startswith("private ") or check_line.startswith("protected ")) and "(" in check_line:
+                            break
 
-            if has_test_annotation or method_name.startswith("test"):
-                test_methods.append(method_name)
-                self.logger.debug("Método de teste encontrado: %s", method_name)
+                    if has_test_annotation:
+                        test_methods.append(method_name)
+                        self.logger.debug("Método de teste encontrado: %s (@Test)", method_name)
+
+            i += 1
 
         return test_methods
 
