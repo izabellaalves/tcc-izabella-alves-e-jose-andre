@@ -12,6 +12,7 @@ services:
     volumes:
       - ./data:/app/data           # Persiste checkouts e features.csv
       - ./logs:/app/logs           # Persiste logs de execução
+      - ./results:/app/results     # Persiste resultados dos experimentos
       
     # Variáveis de ambiente
     environment:
@@ -45,6 +46,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
+      - ./results:/app/results
     environment:
       - TZ=America/Los_Angeles
       - PYTHONUNBUFFERED=1

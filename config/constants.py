@@ -13,10 +13,14 @@ DATA_RESULTS_DIR = DATA_DIR / "results"
 
 DEFECTS4J_DIR = PROJECT_ROOT / "defects4j"
 
-PROJECTS = ["Lang", "Chart"]
+PROJECTS = ["Lang", "Chart", "Math", "Time", "Mockito", "Compress"]
 EXPECTED_BUGS = {
-    "Lang": 61,
+    "Lang": 58,
     "Chart": 26,
+    "Math": 102,
+    "Time": 25,
+    "Mockito": 31,
+    "Compress": 46,
 }
 
 DEFECTS4J_PROPERTIES = [
@@ -34,6 +38,9 @@ FEATURE_COLUMNS = [
     "history",
     "same_package",
     "modified_classes_count",
+    "historical_failure_rate",
+    "last_failure_distance",
+    "test_name_similarity",
     "label",
 ]
 

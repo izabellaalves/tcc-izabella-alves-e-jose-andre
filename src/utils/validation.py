@@ -54,6 +54,9 @@ class FeaturesValidator:
             "history",
             "same_package",
             "modified_classes_count",
+            "historical_failure_rate",
+            "last_failure_distance",
+            "test_name_similarity",
             "label",
         ]
 
@@ -168,6 +171,30 @@ class FeaturesValidator:
         self.validation_results["modified_classes_count_stats"] = mod_classes_stats.to_dict()
         self.validation_results["modified_classes_count_distribution"] = mod_classes_counts
 
+        self.logger.info("Feature 'historical_failure_rate':")
+        hfr_stats = df["historical_failure_rate"].describe()
+        self.logger.info("  Min: %.4f", hfr_stats["min"])
+        self.logger.info("  Max: %.4f", hfr_stats["max"])
+        self.logger.info("  Mean: %.4f", hfr_stats["mean"])
+        self.logger.info("  Median: %.4f", hfr_stats["50%"])
+        self.validation_results["historical_failure_rate_stats"] = hfr_stats.to_dict()
+
+        self.logger.info("Feature 'last_failure_distance':")
+        lfd_stats = df["last_failure_distance"].describe()
+        self.logger.info("  Min: %.0f", lfd_stats["min"])
+        self.logger.info("  Max: %.0f", lfd_stats["max"])
+        self.logger.info("  Mean: %.2f", lfd_stats["mean"])
+        self.logger.info("  Median: %.0f", lfd_stats["50%"])
+        self.validation_results["last_failure_distance_stats"] = lfd_stats.to_dict()
+
+        self.logger.info("Feature 'test_name_similarity':")
+        tns_stats = df["test_name_similarity"].describe()
+        self.logger.info("  Min: %.4f", tns_stats["min"])
+        self.logger.info("  Max: %.4f", tns_stats["max"])
+        self.logger.info("  Mean: %.4f", tns_stats["mean"])
+        self.logger.info("  Median: %.4f", tns_stats["50%"])
+        self.validation_results["test_name_similarity_stats"] = tns_stats.to_dict()
+
         return True
 
     def _generate_report(self, df: pd.DataFrame):
@@ -210,6 +237,24 @@ class FeaturesValidator:
         self.logger.info("  Max: %s", df["modified_classes_count"].max())
         self.logger.info("  Mean: %.2f", df["modified_classes_count"].mean())
         self.logger.info("  Median: %.2f", df["modified_classes_count"].median())
+
+        self.logger.info("Feature 'historical_failure_rate':")
+        self.logger.info("  Min: %.4f", df["historical_failure_rate"].min())
+        self.logger.info("  Max: %.4f", df["historical_failure_rate"].max())
+        self.logger.info("  Mean: %.4f", df["historical_failure_rate"].mean())
+        self.logger.info("  Median: %.4f", df["historical_failure_rate"].median())
+
+        self.logger.info("Feature 'last_failure_distance':")
+        self.logger.info("  Min: %d", df["last_failure_distance"].min())
+        self.logger.info("  Max: %d", df["last_failure_distance"].max())
+        self.logger.info("  Mean: %.2f", df["last_failure_distance"].mean())
+        self.logger.info("  Median: %.1f", df["last_failure_distance"].median())
+
+        self.logger.info("Feature 'test_name_similarity':")
+        self.logger.info("  Min: %.4f", df["test_name_similarity"].min())
+        self.logger.info("  Max: %.4f", df["test_name_similarity"].max())
+        self.logger.info("  Mean: %.4f", df["test_name_similarity"].mean())
+        self.logger.info("  Median: %.4f", df["test_name_similarity"].median())
 
         if df["modified_classes_count"].nunique() == 1:
             self.logger.info(

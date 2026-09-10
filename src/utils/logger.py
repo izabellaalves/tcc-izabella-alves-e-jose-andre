@@ -80,14 +80,14 @@ class BugProcessingLogger:
 
         return False
 
-    def info(self, message: str):
-        self.logger.info("[%s] %s", self.bug_name, message)
+    def info(self, message: str, *args, **kwargs):
+        self.logger.info(f"[{self.bug_name}] {message}", *args, **kwargs)
 
-    def warning(self, message: str):
-        self.logger.warning("[%s] %s", self.bug_name, message)
+    def warning(self, message: str, *args, **kwargs):
+        self.logger.warning(f"[{self.bug_name}] {message}", *args, **kwargs)
 
-    def error(self, message: str):
-        self.logger.error("[%s] %s", self.bug_name, message)
+    def error(self, message: str, *args, **kwargs):
+        self.logger.error(f"[{self.bug_name}] {message}", *args, **kwargs)
 
-    def debug(self, message: str):
-        self.logger.debug("[%s] %s", self.bug_name, message)
+    def debug(self, message: str, *args, **kwargs):
+        self.logger.debug(f"[{self.bug_name}] {message}", *args, **kwargs)
