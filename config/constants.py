@@ -38,9 +38,6 @@ FEATURE_COLUMNS = [
     "history",
     "same_package",
     "modified_classes_count",
-    "historical_failure_rate",
-    "last_failure_distance",
-    "test_name_similarity",
     "label",
 ]
 

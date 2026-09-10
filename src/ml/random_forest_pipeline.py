@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import precision_recall_fscore_support
-from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.model_selection import GridSearchCV, GroupKFold
 
 from src.metrics.apfd import calculate_apfd
 
@@ -28,18 +28,15 @@ FEATURES = [
     "history",
     "same_package",
     "modified_classes_count",
-    "historical_failure_rate",
-    "last_failure_distance",
-    "test_name_similarity",
 ]
 
 SPLIT_PLAN = {
     "Lang": {"train": 41, "test": 17, "fixed_train": [1]},
     "Chart": {"train": 18, "test": 8, "fixed_train": []},
-    "Math": {"train": 71, "test": 31, "fixed_train": []},
+    "Math": {"train": 74, "test": 28, "fixed_train": [22, 41, 78]},
     "Time": {"train": 18, "test": 7, "fixed_train": []},
-    "Mockito": {"train": 22, "test": 9, "fixed_train": []},
-    "Compress": {"train": 32, "test": 14, "fixed_train": []},
+    "Mockito": {"train": 23, "test": 8, "fixed_train": [22]},
+    "Compress": {"train": 33, "test": 13, "fixed_train": [28]},
 }
 
 
@@ -71,6 +68,7 @@ def mask_for(df: pd.DataFrame, split_side: dict) -> pd.Series:
 
 def train(df_train: pd.DataFrame, scoring: str = "f1", suffix: str = "") -> tuple:
     X, y = df_train[FEATURES], df_train["label"]
+    groups = df_train["bug"]
     param_grid = {
         "n_estimators": [100, 200, 500],
         "max_depth": [None, 5, 10, 20],
@@ -81,16 +79,16 @@ def train(df_train: pd.DataFrame, scoring: str = "f1", suffix: str = "") -> tupl
         RandomForestClassifier(class_weight="balanced", random_state=42, n_jobs=-1),
         param_grid,
         scoring=scoring,
-        cv=StratifiedKFold(n_splits=5, shuffle=True, random_state=42),
+        cv=GroupKFold(n_splits=5),
         n_jobs=-1,
     )
-    search.fit(X, y)
+    search.fit(X, y, groups=groups)
     model = search.best_estimator_
     joblib.dump(model, RESULTS_DIR / f"rf_model{suffix}.joblib")
     with open(RESULTS_DIR / f"rf_hyperparameters{suffix}.json", "w") as f:
         json.dump({"best_params": search.best_params_,
                    f"cv_best_{scoring}": search.best_score_,
-                   "scoring": scoring, "cv": "StratifiedKFold(5, shuffle, seed=42)",
+                   "scoring": scoring, "cv": "GroupKFold(5, grouped by bug)",
                    "fixed_params": {"class_weight": "balanced", "random_state": 42}},
                   f, indent=2)
     return model, search.best_params_, search.best_score_
