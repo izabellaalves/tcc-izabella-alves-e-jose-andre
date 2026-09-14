@@ -6,6 +6,7 @@ Gera: results/apfd_long_format.csv, results/descriptive_statistics.csv,
 """
 
 import json
+import sys
 from itertools import combinations
 from pathlib import Path
 
@@ -13,11 +14,13 @@ import pandas as pd
 from scipy.stats import wilcoxon
 
 RESULTS_DIR = Path("results")
+# Sufixo opcional (ex.: _no_samepackage) para consolidar um RF alternativo sem sobrescrever o principal.
+SUFFIX = sys.argv[1] if len(sys.argv) > 1 else ""
 
 STRATEGIES = {
     "Random": ("random_baseline_apfd.csv", "apfd_mean"),
     "History-based": ("history_baseline_apfd.csv", "apfd"),
-    "Random Forest": ("random_forest_apfd.csv", "apfd"),
+    "Random Forest": (f"random_forest_apfd{SUFFIX}.csv", "apfd"),
 }
 
 
@@ -55,7 +58,7 @@ def load_long() -> pd.DataFrame:
     assert not long_df["apfd"].isnull().any(), "APFD nulo encontrado após filtragem"
     assert len(long_df) == 3 * n_valid
 
-    long_df.to_csv(RESULTS_DIR / "apfd_long_format.csv", index=False)
+    long_df.to_csv(RESULTS_DIR / f"apfd_long_format{SUFFIX}.csv", index=False)
     return long_df
 
 
@@ -71,7 +74,7 @@ def descriptive_stats(long_df: pd.DataFrame) -> pd.DataFrame:
     stats = pd.concat([stats_for(long_df, "Geral")] +
                       [stats_for(long_df[long_df["project"] == p], p)
                        for p in ("Lang", "Chart", "Math", "Time", "Mockito", "Compress")], ignore_index=True)
-    stats.to_csv(RESULTS_DIR / "descriptive_statistics.csv", index=False)
+    stats.to_csv(RESULTS_DIR / f"descriptive_statistics{SUFFIX}.csv", index=False)
     return stats
 
 
@@ -81,7 +84,7 @@ def wins_by_bug(long_df: pd.DataFrame) -> tuple:
     best = wide.apply(lambda r: " / ".join(n for n in names if r[n] == r.max()), axis=1)
     worst = wide.apply(lambda r: " / ".join(n for n in names if r[n] == r.min()), axis=1)
     out = wide.round(4).assign(best_strategy=best, worst_strategy=worst).reset_index()
-    out.to_csv(RESULTS_DIR / "wins_by_bug.csv", index=False)
+    out.to_csv(RESULTS_DIR / f"wins_by_bug{SUFFIX}.csv", index=False)
     win_counts = best.value_counts()
     return out, win_counts
 
@@ -95,7 +98,7 @@ def statistical_tests(long_df: pd.DataFrame) -> pd.DataFrame:
                      "p_value": p, "significant_p<0.05": p < 0.05,
                      "n_pairs": len(wide)})
     tests = pd.DataFrame(rows)
-    tests.to_csv(RESULTS_DIR / "statistical_tests.csv", index=False)
+    tests.to_csv(RESULTS_DIR / f"statistical_tests{SUFFIX}.csv", index=False)
     return tests
 
 

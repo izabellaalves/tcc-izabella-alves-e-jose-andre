@@ -24,11 +24,12 @@ CSV_PATH = "data/processed/features.csv"
 RESULTS_DIR = Path("results")
 
 SPLIT_SEED = 42
+# Ablação diagnóstica: same_package removida. Tudo o mais (split, CV, grid) idêntico.
 FEATURES = [
     "history",
-    "same_package",
     "modified_classes_count",
 ]
+SUFFIX = "_no_samepackage"
 
 SPLIT_PLAN = {
     "Lang": {"train": 41, "test": 17, "fixed_train": [1]},
@@ -143,7 +144,7 @@ def summary(rf: pd.DataFrame, split: dict):
 
 
 def run(scoring: str = "f1"):
-    suffix = "" if scoring == "f1" else f"_{scoring.replace('_', '')}"
+    suffix = SUFFIX if scoring == "f1" else f"{SUFFIX}_{scoring.replace('_', '')}"
     df = pd.read_csv(CSV_PATH)
     split = make_split(df)
     print(f"Split por bug salvo em results/train_test_split.json (seed={SPLIT_SEED})")

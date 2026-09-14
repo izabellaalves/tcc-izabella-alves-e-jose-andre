@@ -1,0 +1,15 @@
+{
+  "best_params": {
+    "max_depth": null,
+    "min_samples_leaf": 1,
+    "min_samples_split": 2,
+    "n_estimators": 100
+  },
+  "cv_best_f1": 0.010547302636119634,
+  "scoring": "f1",
+  "cv": "GroupKFold(5, grouped by bug)",
+  "fixed_params": {
+    "class_weight": "balanced",
+    "random_state": 42
+  }
+}
