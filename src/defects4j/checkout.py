@@ -4,7 +4,7 @@ import csv
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Sequence, Tuple
 
 from src.defects4j.wrapper import Defects4JWrapper
 from src.utils.environment import EnvironmentConfig
@@ -172,3 +172,41 @@ class CheckoutManager:
         self.logger.info("Projetos: %s", ", ".join(projects))
 
         return all_bugs
+
+    def process_bugs(
+        self,
+        bugs: Sequence[Tuple[str, int]],
+        skip_if_exists: bool = False,
+    ) -> List[BugInfo]:
+        if not bugs:
+            self.logger.error("Nenhum bug informado para processar")
+            return []
+
+        self.logger.info("Processando %d bug(s) específico(s)", len(bugs))
+
+        successful_bugs = []
+        failed_bugs = []
+
+        for i, (project, bug_id) in enumerate(bugs, 1):
+            self.logger.info("Progresso: %d/%d — %s-%s", i, len(bugs), project, bug_id)
+            success, work_dir = self.checkout_and_compile(
+                project,
+                bug_id,
+                skip_if_exists=skip_if_exists,
+            )
+            if success:
+                successful_bugs.append(BugInfo(project, bug_id, work_dir))
+            else:
+                failed_bugs.append((project, bug_id))
+
+        self.logger.info(
+            "Resumo bugs específicos: sucesso %d/%d",
+            len(successful_bugs),
+            len(bugs),
+        )
+        if failed_bugs:
+            self.logger.warning("Falharam %d bug(s):", len(failed_bugs))
+            for proj, bid in failed_bugs:
+                self.logger.warning("  - %s-%s", proj, bid)
+
+        return successful_bugs

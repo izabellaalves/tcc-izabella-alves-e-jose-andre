@@ -1,18 +1,10 @@
-"""Pipeline Random Forest: split por bug, treino com tuning e avaliação (APFD + P/R/F1).
-
-Uso: python3 -m src.ml.random_forest_pipeline [scoring]
-     scoring: f1 (default) ou roc_auc — muda a métrica do GridSearchCV e o
-     sufixo dos arquivos de saída (ex. random_forest_apfd_rocauc.csv).
-Gera: results/train_test_split.json, results/rf_model*.joblib,
-      results/rf_hyperparameters*.json, results/random_forest_apfd*.csv
-"""
+"""Pipeline Random Forest: split por bug, treino com tuning e avaliação (APFD + P/R/F1)."""
 
 import json
 import sys
 from pathlib import Path
 
 import joblib
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import precision_recall_fscore_support
@@ -23,39 +15,63 @@ from src.metrics.apfd import calculate_apfd
 CSV_PATH = "data/processed/features.csv"
 RESULTS_DIR = Path("results")
 
-SPLIT_SEED = 42
+TEST_RATIO = 0.30
 FEATURES = [
     "history",
     "same_package",
     "modified_classes_count",
 ]
 
-SPLIT_PLAN = {
-    "Lang": {"train": 41, "test": 17, "fixed_train": [1]},
-    "Chart": {"train": 18, "test": 8, "fixed_train": []},
-    "Math": {"train": 74, "test": 28, "fixed_train": [22, 41, 78]},
-    "Time": {"train": 18, "test": 7, "fixed_train": []},
-    "Mockito": {"train": 23, "test": 8, "fixed_train": [22]},
-    "Compress": {"train": 33, "test": 13, "fixed_train": [28]},
-}
-
 
 def make_split(df: pd.DataFrame) -> dict:
-    rng = np.random.default_rng(SPLIT_SEED)
-    split = {"seed": SPLIT_SEED, "train": {}, "test": {}}
-    for project, plan in SPLIT_PLAN.items():
-        bugs = sorted(df.loc[df["project"] == project, "bug"].unique().tolist())
-        fixed = plan["fixed_train"]
-        pool = [b for b in bugs if b not in fixed]
-        shuffled = rng.permutation(pool).tolist()
-        n_test = plan["test"]
-        split["test"][project] = sorted(int(b) for b in shuffled[:n_test])
-        split["train"][project] = sorted(fixed + [int(b) for b in shuffled[n_test:]])
-        assert len(split["train"][project]) == plan["train"]
-        assert len(split["test"][project]) == plan["test"]
+    split = {"method": "chronological_70_30", "train": {}, "test": {}}
+    projects = sorted(df["project"].unique())
+
+    for project in projects:
+        df_project = df[df["project"] == project]
+        all_bugs = sorted(df_project["bug"].unique().tolist())
+        bugs_with_no_trigger = []
+        bugs_with_trigger = []
+
+        for bug_id in all_bugs:
+            df_bug = df_project[df_project["bug"] == bug_id]
+            if df_bug["label"].sum() == 0:
+                bugs_with_no_trigger.append(int(bug_id))
+            else:
+                bugs_with_trigger.append(int(bug_id))
+
+        n_test = round(len(bugs_with_trigger) * TEST_RATIO)
+        test_bugs = bugs_with_trigger[-n_test:] if n_test > 0 else []
+        train_bugs_eligible = bugs_with_trigger[:-n_test] if n_test > 0 else bugs_with_trigger
+
+        split["train"][project] = sorted(bugs_with_no_trigger + train_bugs_eligible)
+        split["test"][project] = sorted(test_bugs)
+
+    summary = {
+        "split_method": "chronological_70_30_by_bug_id",
+        "test_ratio": TEST_RATIO,
+        "projects": {},
+    }
+
+    for project in projects:
+        df_project = df[df["project"] == project]
+        no_trigger = sum(
+            1 for b in split["train"][project]
+            if df_project[df_project["bug"] == b]["label"].sum() == 0
+        )
+        summary["projects"][project] = {
+            "total_bugs": df_project["bug"].nunique(),
+            "bugs_without_trigger": no_trigger,
+            "train": len(split["train"][project]),
+            "test": len(split["test"][project]),
+        }
+
+    split["summary"] = summary
+
     RESULTS_DIR.mkdir(exist_ok=True)
     with open(RESULTS_DIR / "train_test_split.json", "w") as f:
         json.dump(split, f, indent=2)
+
     return split
 
 
@@ -133,6 +149,13 @@ def summary(rf: pd.DataFrame, split: dict):
     print(f"  Geral: {stats(rf['apfd'])}")
     print(rf.groupby("project")["apfd"].agg(["mean", "median", "std"]).round(4).to_string())
 
+    bugs_sem_trigger_no_teste = rf[rf["n_trigger_tests"] == 0]
+    if not bugs_sem_trigger_no_teste.empty:
+        print("\nAVISO: Bugs sem trigger encontrados no conjunto de teste:")
+        print(bugs_sem_trigger_no_teste[["project", "bug", "n_tests"]].to_string(index=False))
+    else:
+        print("\nOK: Todos os bugs de teste tem pelo menos 1 trigger test")
+
     print("\nComparação com as baselines NOS MESMOS bugs de teste:")
     for name, path, col in [("Random", "random_baseline_apfd.csv", "apfd_mean"),
                             ("History", "history_baseline_apfd.csv", "apfd")]:
@@ -146,10 +169,23 @@ def run(scoring: str = "f1"):
     suffix = "" if scoring == "f1" else f"_{scoring.replace('_', '')}"
     df = pd.read_csv(CSV_PATH)
     split = make_split(df)
-    print(f"Split por bug salvo em results/train_test_split.json (seed={SPLIT_SEED})")
-    for side in ("train", "test"):
-        for proj, bugs in split[side].items():
-            print(f"  {side} {proj} ({len(bugs)}): {bugs}")
+
+    print(f"\n{'='*80}")
+    print("Split crescente 70/30 por id de bug criado")
+    print(f"{'='*80}")
+    print("Metodo: ultimos 30% bugs com trigger -> teste, primeiros 70% + sem trigger -> treino")
+    print("\nResumo por projeto:")
+    for proj in sorted(split["test"].keys()):
+        n_train = len(split["train"][proj])
+        n_test = len(split["test"][proj])
+        print(f"  {proj:<10} treino: {n_train:2d}  teste: {n_test:2d}  total: {n_train + n_test:2d}")
+        if "summary" in split and proj in split["summary"]["projects"]:
+            no_trigger = split["summary"]["projects"][proj]["bugs_without_trigger"]
+            if no_trigger > 0:
+                print(f"             (inclui {no_trigger} bug(s) sem trigger no treino)")
+
+    print("\nSplit salvo em results/train_test_split.json")
+    print(f"{'='*80}\n")
 
     df_train = df[mask_for(df, split["train"])]
     df_test = df[mask_for(df, split["test"])]
