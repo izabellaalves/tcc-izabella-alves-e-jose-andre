@@ -1,10 +1,15 @@
-"""Baseline Same-Package: ordena por same_package decrescente."""
+"""Baseline Same-Package: ordena por same_package decrescente.
+
+Ordenação determinística: same_package decrescente, empates por test_method
+alfabético, igual à baseline History.
+Uso: python3 -m src.baselines.same_package_baseline
+Gera results/same_package_baseline_apfd.csv (uma linha por bug).
+"""
 
 import json
 from pathlib import Path
 
 import pandas as pd
-from scipy.stats import wilcoxon
 
 from src.metrics.apfd import calculate_apfd
 
@@ -57,24 +62,12 @@ def run(csv_path: str = CSV_PATH, output_path: str = OUTPUT_PATH) -> pd.DataFram
         print("\nPor projeto (teste):")
         print(test.groupby("project")["apfd"].agg(["mean", "median", "std"]).round(4).to_string())
 
-        rf_path = Path("results/random_forest_apfd.csv")
-        if rf_path.exists():
-            rf = pd.read_csv(rf_path)
-            rf = rf[rf.apply(lambda r: (r["project"], r["bug"]) in test_pairs, axis=1)]
-            merged = test.merge(
-                rf[["project", "bug", "apfd"]],
-                on=["project", "bug"],
-                suffixes=("_same_package", "_rf"),
-            )
-            _, p = wilcoxon(merged["apfd_rf"], merged["apfd_same_package"])
-            ties = (merged["apfd_rf"] == merged["apfd_same_package"]).sum()
-            rf_wins = (merged["apfd_rf"] > merged["apfd_same_package"]).sum()
-            sp_wins = (merged["apfd_same_package"] > merged["apfd_rf"]).sum()
-            print("\nComparacao com Random Forest (mesmos bugs de teste):")
-            print(f"  RF media:            {merged['apfd_rf'].mean():.4f}")
-            print(f"  same_package media:  {merged['apfd_same_package'].mean():.4f}")
-            print(f"  Wilcoxon p:          {p:.4f}")
-            print(f"  RF melhor: {rf_wins}  |  same_package melhor: {sp_wins}  |  empate: {ties}")
+        print(
+            "\nComparação estatística com as outras estratégias: "
+            "rode 'python3 -m src.metrics.consolidate_results'.\n"
+            "Os p-valores saem de lá, sobre APFDs arredondados, para que os empates "
+            "não dependam do último bit de ponto flutuante."
+        )
 
     return results
 

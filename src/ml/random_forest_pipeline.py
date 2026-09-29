@@ -1,4 +1,13 @@
-"""Pipeline Random Forest: split por bug, treino com tuning e avaliação (APFD + P/R/F1)."""
+"""Pipeline Random Forest: split cronológico por bug, tuning e avaliação (APFD + P/R/F1).
+
+Uso: python3 -m src.ml.random_forest_pipeline [scoring]
+     scoring: f1 (default) ou roc_auc. Com roc_auc o GridSearchCV otimiza a
+     área sob a curva ROC, que é mais coerente com o objetivo de ordenar testes
+     do que o F1 num problema com 0,5% de positivos; os arquivos de saída ganham
+     o sufixo _rocauc.
+Gera: results/train_test_split.json, results/rf_model*.joblib,
+      results/rf_hyperparameters*.json, results/random_forest_apfd*.csv
+"""
 
 import json
 import sys
@@ -11,6 +20,7 @@ from sklearn.metrics import precision_recall_fscore_support
 from sklearn.model_selection import GridSearchCV, GroupKFold
 
 from src.metrics.apfd import calculate_apfd
+from src.utils.bug_dates import chronological_order
 
 CSV_PATH = "data/processed/features.csv"
 RESULTS_DIR = Path("results")
@@ -24,21 +34,21 @@ FEATURES = [
 
 
 def make_split(df: pd.DataFrame) -> dict:
-    split = {"method": "chronological_70_30", "train": {}, "test": {}}
+    split = {"method": "chronological_70_30_by_commit_date", "train": {}, "test": {}}
     projects = sorted(df["project"].unique())
 
     for project in projects:
         df_project = df[df["project"] == project]
-        all_bugs = sorted(df_project["bug"].unique().tolist())
+        # Ordem cronológica real (data do commit), com o id como desempate.
+        chronological = chronological_order(project, df_project["bug"].unique())
+
         bugs_with_no_trigger = []
         bugs_with_trigger = []
-
-        for bug_id in all_bugs:
-            df_bug = df_project[df_project["bug"] == bug_id]
-            if df_bug["label"].sum() == 0:
-                bugs_with_no_trigger.append(int(bug_id))
+        for bug_id in chronological:
+            if df_project.loc[df_project["bug"] == bug_id, "label"].sum() == 0:
+                bugs_with_no_trigger.append(bug_id)
             else:
-                bugs_with_trigger.append(int(bug_id))
+                bugs_with_trigger.append(bug_id)
 
         n_test = round(len(bugs_with_trigger) * TEST_RATIO)
         test_bugs = bugs_with_trigger[-n_test:] if n_test > 0 else []
@@ -48,8 +58,13 @@ def make_split(df: pd.DataFrame) -> dict:
         split["test"][project] = sorted(test_bugs)
 
     summary = {
-        "split_method": "chronological_70_30_by_bug_id",
+        "split_method": "chronological_70_30_by_fixed_commit_date",
         "test_ratio": TEST_RATIO,
+        "description": (
+            "Bugs ordenados pela data do commit de correção (não pelo id, que é "
+            "decrescente no tempo em Lang, Chart e Math). Últimos 30% com trigger "
+            "vão para o teste; primeiros 70% e todos os bugs sem trigger, para o treino."
+        ),
         "projects": {},
     }
 
@@ -84,7 +99,10 @@ def mask_for(df: pd.DataFrame, split_side: dict) -> pd.Series:
 
 def train(df_train: pd.DataFrame, scoring: str = "f1", suffix: str = "") -> tuple:
     X, y = df_train[FEATURES], df_train["label"]
-    groups = df_train["bug"]
+    # Agrupa por project+bug: ids de bug se repetem entre projetos (o id 5 existe
+    # nos seis), e agrupar só por "bug" colapsa 208 bugs em 75 grupos, vazando
+    # instâncias do mesmo bug entre folds.
+    groups = df_train["project"] + "-" + df_train["bug"].astype(str)
     param_grid = {
         "n_estimators": [100, 200, 500],
         "max_depth": [None, 5, 10, 20],
@@ -104,7 +122,7 @@ def train(df_train: pd.DataFrame, scoring: str = "f1", suffix: str = "") -> tupl
     with open(RESULTS_DIR / f"rf_hyperparameters{suffix}.json", "w") as f:
         json.dump({"best_params": search.best_params_,
                    f"cv_best_{scoring}": search.best_score_,
-                   "scoring": scoring, "cv": "GroupKFold(5, grouped by bug)",
+                   "scoring": scoring, "cv": "GroupKFold(5, grouped by project+bug)",
                    "fixed_params": {"class_weight": "balanced", "random_state": 42}},
                   f, indent=2)
     return model, search.best_params_, search.best_score_
@@ -128,9 +146,11 @@ def evaluate(model, df_test: pd.DataFrame, suffix: str = "") -> pd.DataFrame:
 
     print("Precision/Recall/F1 da classificação binária (threshold 0.5) — apenas RF,")
     print("baselines não fazem classificação binária:")
-    for name, subset in [("Geral", df_test),
-                         ("Lang", df_test[df_test["project"] == "Lang"]),
-                         ("Chart", df_test[df_test["project"] == "Chart"])]:
+    subsets = [("Geral", df_test)] + [
+        (proj, df_test[df_test["project"] == proj])
+        for proj in sorted(df_test["project"].unique())
+    ]
+    for name, subset in subsets:
         p, r, f1, _ = precision_recall_fscore_support(
             subset["label"], subset["pred"], average="binary", zero_division=0)
         pos = int(subset["label"].sum())
@@ -158,7 +178,10 @@ def summary(rf: pd.DataFrame, split: dict):
 
     print("\nComparação com as baselines NOS MESMOS bugs de teste:")
     for name, path, col in [("Random", "random_baseline_apfd.csv", "apfd_mean"),
-                            ("History", "history_baseline_apfd.csv", "apfd")]:
+                            ("History", "history_baseline_apfd.csv", "apfd"),
+                            ("SamePkg", "same_package_baseline_apfd.csv", "apfd")]:
+        if not (RESULTS_DIR / path).exists():
+            continue
         base = pd.read_csv(RESULTS_DIR / path)
         base = base[base.apply(lambda r: (r["project"], r["bug"]) in test_pairs, axis=1)]
         print(f"  {name:<8} {stats(base[col])}")
@@ -171,9 +194,10 @@ def run(scoring: str = "f1"):
     split = make_split(df)
 
     print(f"\n{'='*80}")
-    print("Split crescente 70/30 por id de bug criado")
+    print("Split cronológico 70/30 por data do commit de correção")
     print(f"{'='*80}")
-    print("Metodo: ultimos 30% bugs com trigger -> teste, primeiros 70% + sem trigger -> treino")
+    print("Metodo: ultimos 30% bugs com trigger (mais recentes) -> teste;")
+    print("        primeiros 70% + todos os bugs sem trigger -> treino")
     print("\nResumo por projeto:")
     for proj in sorted(split["test"].keys()):
         n_train = len(split["train"][proj])
@@ -192,7 +216,7 @@ def run(scoring: str = "f1"):
     print(f"\nInstâncias: treino={len(df_train)}, teste={len(df_test)}")
 
     model, best_params, cv_score = train(df_train, scoring, suffix)
-    print(f"\nMelhores hiperparâmetros (GridSearchCV, {scoring}, 5-fold estratificado no treino):")
+    print(f"\nMelhores hiperparâmetros (GridSearchCV, {scoring}, GroupKFold 5-fold por project+bug):")
     print(f"  {best_params}  ({scoring} médio na CV: {cv_score:.4f})")
     print(f"Modelo salvo em results/rf_model{suffix}.joblib, "
           f"hiperparâmetros em results/rf_hyperparameters{suffix}.json\n")

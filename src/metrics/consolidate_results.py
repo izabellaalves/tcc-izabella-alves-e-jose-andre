@@ -1,8 +1,12 @@
-"""Consolida os resultados de APFD das três estratégias nos 86 bugs de teste.
+"""Consolida os resultados de APFD das quatro estratégias no conjunto de teste.
 
 Uso: python3 -m src.metrics.consolidate_results
 Gera: results/apfd_long_format.csv, results/descriptive_statistics.csv,
       results/wins_by_bug.csv, results/statistical_tests.csv
+
+O APFD é arredondado a APFD_DECIMALS casas antes de qualquer comparação. Sem
+isso, valores matematicamente iguais diferem no último bit conforme venham da
+memória ou de um CSV, o que desfaz empates reais e muda os p-valores do Wilcoxon.
 """
 
 import json
@@ -14,9 +18,15 @@ from scipy.stats import wilcoxon
 
 RESULTS_DIR = Path("results")
 
+# Casas decimais usadas para comparar APFDs. O APFD é 1 - tf1/n + 1/(2n), com
+# n <= ~10^4, então 10 casas preservam toda a diferença real e descartam o ruído
+# de ponto flutuante do ida e volta em CSV.
+APFD_DECIMALS = 10
+
 STRATEGIES = {
     "Random": ("random_baseline_apfd.csv", "apfd_mean"),
     "History-based": ("history_baseline_apfd.csv", "apfd"),
+    "same_package": ("same_package_baseline_apfd.csv", "apfd"),
     "Random Forest": ("random_forest_apfd.csv", "apfd"),
 }
 
@@ -32,6 +42,7 @@ def load_long() -> pd.DataFrame:
         df = df[[("project"), "bug", apfd_col, "n_tests", "n_trigger_tests"]]
         df = df.rename(columns={apfd_col: "apfd"})
         df = df[df.apply(lambda r: (r["project"], r["bug"]) in test_pairs, axis=1)]
+        df["apfd"] = df["apfd"].round(APFD_DECIMALS)
         df.insert(0, "strategy", strategy)
         frames.append(df)
     long_df = pd.concat(frames, ignore_index=True)
@@ -53,7 +64,7 @@ def load_long() -> pd.DataFrame:
     assert all(bugs == valid_bugs for bugs in per_strategy), \
         "Bugs de teste divergem entre estratégias"
     assert not long_df["apfd"].isnull().any(), "APFD nulo encontrado após filtragem"
-    assert len(long_df) == 3 * n_valid
+    assert len(long_df) == len(STRATEGIES) * n_valid
 
     long_df.to_csv(RESULTS_DIR / "apfd_long_format.csv", index=False)
     return long_df
@@ -93,6 +104,11 @@ def statistical_tests(long_df: pd.DataFrame) -> pd.DataFrame:
         stat, p = wilcoxon(wide[a], wide[b])
         rows.append({"comparison": f"{a} vs {b}", "wilcoxon_statistic": stat,
                      "p_value": p, "significant_p<0.05": p < 0.05,
+                     "mean_a": round(wide[a].mean(), 4),
+                     "mean_b": round(wide[b].mean(), 4),
+                     "wins_a": int((wide[a] > wide[b]).sum()),
+                     "wins_b": int((wide[b] > wide[a]).sum()),
+                     "ties": int((wide[a] == wide[b]).sum()),
                      "n_pairs": len(wide)})
     tests = pd.DataFrame(rows)
     tests.to_csv(RESULTS_DIR / "statistical_tests.csv", index=False)
@@ -103,7 +119,8 @@ def run():
     long_df = load_long()
     n_bugs = long_df.groupby("strategy").size().iloc[0]
     print(f"Formato longo salvo em results/apfd_long_format.csv "
-          f"({n_bugs} bugs x 3 estratégias, sem NaN, bugs idênticos nas três)")
+          f"({n_bugs} bugs x {len(STRATEGIES)} estratégias, sem NaN, "
+          f"bugs idênticos em todas)")
 
     print("\n=== Estatísticas descritivas do APFD (results/descriptive_statistics.csv) ===")
     print(descriptive_stats(long_df).to_string(index=False))
@@ -112,8 +129,9 @@ def run():
     tests = statistical_tests(long_df)
     for _, r in tests.iterrows():
         sig = "SIGNIFICATIVA" if r["significant_p<0.05"] else "não significativa"
-        print(f"  {r['comparison']:<38} W={r['wilcoxon_statistic']:.1f}  "
-              f"p={r['p_value']:.4f}  -> {sig} (p<0.05)")
+        print(f"  {r['comparison']:<34} W={r['wilcoxon_statistic']:>7.1f}  "
+              f"p={r['p_value']:.4f}  {r['wins_a']:>2}x{r['wins_b']:<2} "
+              f"({r['ties']:>2} empates)  -> {sig}")
 
     _, win_counts = wins_by_bug(long_df)
     print("\n=== Vitórias por bug — maior APFD (results/wins_by_bug.csv) ===")

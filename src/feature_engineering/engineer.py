@@ -8,6 +8,7 @@ import pandas as pd
 
 from src.defects4j.metadata_exporter import BugMetadata
 from src.feature_engineering.test_enumerator import TestMethod
+from src.utils.bug_dates import chronological_rank
 from src.utils.environment import EnvironmentConfig
 from src.utils.helpers import extract_package_name
 from src.utils.logger import get_logger
@@ -114,11 +115,18 @@ class FeatureEngineer:
         return df
 
     def calculate_history_feature(self, df: pd.DataFrame) -> pd.Series:
-        """Calcula history com base apenas em bugs anteriores do mesmo projeto."""
-        self.logger.info("Calculando feature 'history'")
+        """Calcula history com base apenas em bugs anteriores do mesmo projeto.
 
+        "Anterior" é pela data do commit de correção, não pelo id do bug: em Lang,
+        Chart e Math o id cresce para trás, então ordenar por id faria o history
+        contar detecções em bugs do futuro.
+        """
+        self.logger.info("Calculando feature 'history' (ordem cronológica real)")
+
+        df = df.copy()
+        df["_chrono"] = chronological_rank(df)
         df_sorted = df.sort_values(
-            ["project", "bug", "test_class", "test_method"]
+            ["project", "_chrono", "test_class", "test_method"]
         ).copy()
 
         history_dict = {}

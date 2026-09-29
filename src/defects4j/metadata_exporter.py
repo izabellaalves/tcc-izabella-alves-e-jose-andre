@@ -119,7 +119,19 @@ class MetadataExporter:
 
         return bin_dir.resolve()
 
-    def export_bug_metadata(self, bug_info: BugInfo) -> Optional[BugMetadata]:
+    def export_bug_metadata(
+        self,
+        bug_info: BugInfo,
+        save_files: bool = True,
+    ) -> Optional[BugMetadata]:
+        """Exporta os metadados de um bug.
+
+        save_files=False pula a gravação dos metadados em disco. Cada `defects4j
+        export` dispara um ant, então salvar os quatro arquivos dobra o número de
+        invocações (cerca de 20s por bug em Math) para produzir arquivos que nada
+        no pipeline lê. Vale manter só quando o checkout é preservado para
+        inspeção manual.
+        """
         work_dir = bug_info.work_dir
 
         self.logger.info("Exportando metadados de %s", bug_info)
@@ -143,7 +155,8 @@ class MetadataExporter:
         modified_classes = self.parse_classes_modified(classes_modified_content)
         test_bin_dir = self.parse_dir_bin_tests(dir_bin_tests_content, work_dir)
 
-        self.save_metadata_files(work_dir)
+        if save_files:
+            self.save_metadata_files(work_dir)
 
         if not trigger_tests:
             self.logger.warning("%s: nenhum teste trigger encontrado", bug_info)
@@ -174,14 +187,18 @@ class MetadataExporter:
 
         return metadata
 
-    def export_multiple_bugs(self, bug_infos: List[BugInfo]) -> List[BugMetadata]:
+    def export_multiple_bugs(
+        self,
+        bug_infos: List[BugInfo],
+        save_files: bool = True,
+    ) -> List[BugMetadata]:
         metadatas = []
         failed_count = 0
 
         for i, bug_info in enumerate(bug_infos, 1):
             self.logger.info("Exportando metadados: %d/%d", i, len(bug_infos))
 
-            metadata = self.export_bug_metadata(bug_info)
+            metadata = self.export_bug_metadata(bug_info, save_files=save_files)
             if metadata:
                 metadatas.append(metadata)
             else:

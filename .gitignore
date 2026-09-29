@@ -22,6 +22,8 @@ build/
 # Dados gerados
 data/raw/
 data/intermediate/*.csv
+# Parciais da regeneração paralela; só o consolidado é versionado
+data/processed/dataset_build_report_*.csv
 
 # Logs
 logs/*.log

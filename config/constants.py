@@ -14,13 +14,19 @@ DATA_RESULTS_DIR = DATA_DIR / "results"
 DEFECTS4J_DIR = PROJECT_ROOT / "defects4j"
 
 PROJECTS = ["Lang", "Chart", "Math", "Time", "Mockito", "Compress"]
+
+# Bugs ativos de cada projeto no Defects4J 3.0.1, conforme
+# framework/projects/<P>/active-bugs.csv. São os valores de referência: qualquer
+# bug ausente do dataset tem de estar justificado em
+# data/processed/dataset_build_report.csv. Antes esta constante guardava a
+# contagem do dataset incompleto, então o validador aprovava a própria falha.
 EXPECTED_BUGS = {
-    "Lang": 58,
+    "Lang": 61,
     "Chart": 26,
-    "Math": 102,
-    "Time": 25,
-    "Mockito": 31,
-    "Compress": 46,
+    "Math": 106,
+    "Time": 26,
+    "Mockito": 38,
+    "Compress": 47,
 }
 
 DEFECTS4J_PROPERTIES = [
