@@ -1,0 +1,8 @@
+strategy,n_bugs,mean,median,std
+RF só same_package,89,0.7412,0.85,0.2599
+same_package,89,0.7412,0.85,0.2599
+RF 3 features,89,0.7314,0.8333,0.2569
+RF sem same_package,89,0.6139,0.6307,0.2678
+RF só history,89,0.6112,0.6307,0.2662
+History-based,89,0.6112,0.6307,0.2662
+Random,89,0.5901,0.5436,0.1405

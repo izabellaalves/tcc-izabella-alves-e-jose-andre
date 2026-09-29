@@ -12,6 +12,14 @@ em data/processed/dataset_build_report.csv. Sem esse registro não há como
 distinguir um bug ausente por falha real de checkout de um bug simplesmente
 esquecido.
 
+A escrita é incremental: as linhas de cada bug vão para o CSV assim que ficam
+prontas, e uma execução interrompida é retomada de onde parou, pulando os bugs
+que já estão no arquivo. Numa base em que um único bug do Mockito leva mais de
+uma hora para compilar, acumular tudo em memória até o fim significa perder
+horas de trabalho a cada interrupção. Bugs que falharam não são pulados: a
+falha pode ter sido transitória, e repeti-la é o que distingue erro real de
+acidente.
+
 Uso (dentro do container):
   python3 scripts/build_dataset_streaming.py
   python3 scripts/build_dataset_streaming.py --projects Lang,Chart
@@ -77,6 +85,30 @@ def parse_arguments() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def load_done(path: Path) -> set:
+    """Pares (project, bug) que já estão no CSV parcial."""
+    if not path.exists():
+        return set()
+    df = pd.read_csv(path, usecols=["project", "bug"])
+    return set(zip(df["project"], df["bug"].astype(int)))
+
+
+def append_csv(path: Path, df: pd.DataFrame) -> None:
+    """Acrescenta linhas ao CSV, escrevendo o cabeçalho só na criação."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, mode="a", header=not path.exists(), index=False)
+
+
+def append_report(path: Path, entry: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    new = not path.exists()
+    with open(path, "a", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(entry.keys()))
+        if new:
+            writer.writeheader()
+        writer.writerow(entry)
+
+
 def main() -> int:
     args = parse_arguments()
     logger = setup_logger()
@@ -97,8 +129,13 @@ def main() -> int:
     enumerator = TestEnumerator(config)
     engineer = FeatureEngineer(config)
 
-    rows: List[dict] = []
-    report: List[dict] = []
+    done = load_done(intermediate_path)
+    if done:
+        logger.info("Retomando: %d bug(s) já no arquivo parcial", len(done))
+
+    n_ok = 0
+    n_failed = 0
+    n_incomplete = 0
     timer = Timer()
     timer.__enter__()
 
@@ -118,6 +155,11 @@ def main() -> int:
             tag = f"{project}-{bug_id}"
             logger.info("[%s] %d/%d", project, i, len(bug_ids))
 
+            if (project, bug_id) in done:
+                logger.info("%s: já processado, pulando", tag)
+                n_ok += 1
+                continue
+
             entry = {
                 "project": project,
                 "bug": bug_id,
@@ -130,8 +172,12 @@ def main() -> int:
 
             success, work_dir = checkout_manager.checkout_and_compile(project, bug_id)
             if not success:
-                entry.update(status="falhou", reason="checkout ou compilação")
-                report.append(entry)
+                entry.update(
+                    status="falhou",
+                    reason=checkout_manager.last_failure or "checkout ou compilação",
+                )
+                append_report(report_path, entry)
+                n_failed += 1
                 logger.error("%s: checkout/compilação falhou", tag)
                 shutil.rmtree(work_dir, ignore_errors=True)
                 continue
@@ -141,7 +187,8 @@ def main() -> int:
             )
             if metadata is None:
                 entry.update(status="falhou", reason="export de metadados")
-                report.append(entry)
+                append_report(report_path, entry)
+                n_failed += 1
                 logger.error("%s: export de metadados falhou", tag)
                 if not args.keep_checkouts:
                     shutil.rmtree(work_dir, ignore_errors=True)
@@ -152,14 +199,14 @@ def main() -> int:
 
             if not methods:
                 entry.update(status="falhou", reason="nenhum método de teste enumerado")
-                report.append(entry)
+                append_report(report_path, entry)
+                n_failed += 1
                 logger.error("%s: nenhum método enumerado", tag)
                 if not args.keep_checkouts:
                     shutil.rmtree(work_dir, ignore_errors=True)
                 continue
 
             df_bug = engineer.build_intermediate_table([metadata], {tag: methods})
-            rows.extend(df_bug.to_dict("records"))
 
             labeled = int(df_bug["is_trigger"].sum())
             entry.update(
@@ -170,44 +217,38 @@ def main() -> int:
             missing = len(metadata.trigger_tests) - labeled
             if missing > 0:
                 entry["reason"] = f"{missing} trigger(s) não enumerado(s)"
-            report.append(entry)
+                n_incomplete += 1
+
+            # Grava antes de seguir: assim uma interrupção custa um bug, não a
+            # execução inteira.
+            append_csv(intermediate_path, df_bug)
+            append_report(report_path, entry)
+            n_ok += 1
 
             if not args.keep_checkouts:
                 shutil.rmtree(work_dir, ignore_errors=True)
 
     timer.__exit__(None, None, None)
 
-    if not rows:
+    if not intermediate_path.exists():
         logger.error("Nenhum bug processado com sucesso")
         return 1
 
-    df_intermediate = pd.DataFrame(rows).sort_values(
-        ["project", "bug", "test_class", "test_method"]
-    ).reset_index(drop=True)
-
-    DATA_INTERMEDIATE_DIR.mkdir(parents=True, exist_ok=True)
-    df_intermediate.to_csv(intermediate_path, index=False)
-
-    DATA_PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    with open(report_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=list(report[0].keys()))
-        writer.writeheader()
-        writer.writerows(report)
-
-    ok = [r for r in report if r["status"] == "ok"]
-    failed = [r for r in report if r["status"] != "ok"]
-    incomplete = [r for r in ok if r["reason"]]
+    df_intermediate = pd.read_csv(intermediate_path)
 
     logger.info("=" * 80)
     logger.info("Concluído em %s", format_duration(timer.elapsed))
-    logger.info("intermediate: %d linhas, %d bugs", len(df_intermediate), len(ok))
-    logger.info("Bugs que falharam: %d", len(failed))
-    for r in failed:
-        logger.warning("  %s-%s: %s", r["project"], r["bug"], r["reason"])
-    logger.info("Bugs com trigger não enumerado: %d", len(incomplete))
-    for r in incomplete:
-        logger.warning("  %s-%s: %s", r["project"], r["bug"], r["reason"])
+    logger.info(
+        "%s: %d linhas, %d bugs",
+        intermediate_path.name,
+        len(df_intermediate),
+        df_intermediate.groupby(["project", "bug"]).ngroups,
+    )
+    logger.info("Bugs processados nesta execução: %d", n_ok)
+    logger.info("Bugs que falharam: %d", n_failed)
+    logger.info("Bugs com trigger não enumerado: %d", n_incomplete)
     logger.info("Relatório: %s", report_path)
+    logger.info("As features saem de scripts/merge_dataset_parts.py")
     logger.info("=" * 80)
 
     return 0

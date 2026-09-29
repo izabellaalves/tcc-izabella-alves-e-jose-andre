@@ -14,6 +14,7 @@ Gera: data/processed/features.csv, data/intermediate/intermediate.csv,
 
 import sys
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 
@@ -33,7 +34,7 @@ from src.utils.logger import setup_logger
 SORT_KEYS = ["project", "bug", "test_class", "test_method"]
 
 
-def merge(pattern: str, directory: Path, out_name: str) -> pd.DataFrame | None:
+def merge(pattern: str, directory: Path, out_name: str) -> Optional[pd.DataFrame]:
     parts = sorted(directory.glob(pattern))
     if not parts:
         print(f"AVISO: nenhum arquivo casa com {directory}/{pattern}")
@@ -46,6 +47,13 @@ def merge(pattern: str, directory: Path, out_name: str) -> pd.DataFrame | None:
         print(f"  {part.name}: {len(df)} linhas")
 
     merged = pd.concat(frames, ignore_index=True)
+
+    # O relatório é acrescentado a cada execução, então um bug reprocessado
+    # aparece mais de uma vez. Vale a última linha, que é a tentativa mais
+    # recente e traz o motivo mais detalhado.
+    if "status" in merged.columns:
+        merged = merged.drop_duplicates(subset=["project", "bug"], keep="last")
+
     keys = [k for k in SORT_KEYS if k in merged.columns]
     if keys:
         merged = merged.sort_values(keys).reset_index(drop=True)

@@ -1,0 +1,22 @@
+comparison,p_value,significant_p<0.05,identical,wins_a,wins_b,ties
+RF 3 features vs RF sem same_package,9.055963616719234e-06,True,False,43,11,35
+RF 3 features vs RF só same_package,9.822737332081734e-05,True,False,6,36,47
+RF 3 features vs RF só history,4.050918021319364e-06,True,False,46,10,33
+RF 3 features vs Random,5.866884674136943e-06,True,False,64,25,0
+RF 3 features vs History-based,4.050918021319364e-06,True,False,46,10,33
+RF 3 features vs same_package,9.822737332081734e-05,True,False,6,36,47
+RF sem same_package vs RF só same_package,1.4279101949307461e-06,True,False,11,57,21
+RF sem same_package vs RF só history,0.011718685599768628,True,False,8,0,81
+RF sem same_package vs Random,0.43574684425653587,False,False,49,40,0
+RF sem same_package vs History-based,0.011718685599768628,True,False,8,0,81
+RF sem same_package vs same_package,1.4279101949307461e-06,True,False,11,57,21
+RF só same_package vs RF só history,6.069714401878226e-07,True,False,60,10,19
+RF só same_package vs Random,1.7468518225752007e-06,True,False,64,25,0
+RF só same_package vs History-based,6.069714401878226e-07,True,False,60,10,19
+RF só same_package vs same_package,,False,True,0,0,89
+RF só history vs Random,0.480342549658587,False,False,49,40,0
+RF só history vs History-based,,False,True,0,0,89
+RF só history vs same_package,6.069714401878226e-07,True,False,10,60,19
+Random vs History-based,0.480342549658587,False,False,40,49,0
+Random vs same_package,1.7468518225752007e-06,True,False,25,64,0
+History-based vs same_package,6.069714401878226e-07,True,False,10,60,19

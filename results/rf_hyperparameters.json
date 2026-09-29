@@ -5,9 +5,9 @@
     "min_samples_split": 2,
     "n_estimators": 100
   },
-  "cv_best_f1": 0.02288164118731797,
+  "cv_best_f1": 0.022379307812681312,
   "scoring": "f1",
-  "cv": "GroupKFold(5, grouped by bug)",
+  "cv": "GroupKFold(5, grouped by project+bug)",
   "fixed_params": {
     "class_weight": "balanced",
     "random_state": 42

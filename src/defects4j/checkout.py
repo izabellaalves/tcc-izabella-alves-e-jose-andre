@@ -12,6 +12,34 @@ from src.utils.helpers import Timer
 from src.utils.logger import BugProcessingLogger, get_logger
 
 
+def summarize_error(stderr: str) -> str:
+    """Resume o stderr do Defects4J numa linha utilizável num CSV.
+
+    Prefere as linhas que dizem o que deu errado de fato (um patch que não
+    aplica, um diretório ausente) à moldura de stack trace do Perl.
+    """
+    if not stderr:
+        return "sem stderr"
+
+    interesting = []
+    for line in stderr.splitlines():
+        line = line.strip()
+        if not line or line.startswith(("at /", "\tVcs::", "\tProject::", "---")):
+            continue
+        if any(
+            key in line
+            for key in ("error:", "No such file", "does not exist", "BUILD FAILED",
+                        "Cannot ", "cannot ", "failed", "FAIL")
+        ):
+            interesting.append(line)
+
+    if not interesting:
+        interesting = [ln.strip() for ln in stderr.splitlines() if ln.strip()][:2]
+
+    summary = "; ".join(interesting[:3])
+    return summary[:300].replace("\n", " ").replace(",", ";")
+
+
 @dataclass
 class BugInfo:
     """Informações de um bug."""
@@ -33,6 +61,10 @@ class CheckoutManager:
         self.wrapper = Defects4JWrapper(config)
         self.logger = get_logger()
         self.data_dir.mkdir(parents=True, exist_ok=True)
+        # Motivo da última falha, para quem registra o resultado por bug. Sem
+        # isso o relatório só sabe dizer "checkout ou compilação", o que não
+        # distingue uma falha real do framework de um bug não tentado.
+        self.last_failure: str = ""
 
     def read_active_bugs(self, project: str) -> List[int]:
         """Lê IDs de bugs ativos de um projeto."""
@@ -83,6 +115,7 @@ class CheckoutManager:
     ) -> Tuple[bool, Path]:
         """Faz checkout e compilação de um bug."""
         work_dir = self.get_bug_work_dir(project, bug_id)
+        self.last_failure = ""
 
         with BugProcessingLogger(self.logger, project, bug_id) as bug_logger:
             if skip_if_exists and self.is_bug_checked_out(work_dir):
@@ -100,6 +133,7 @@ class CheckoutManager:
             if not result.success:
                 bug_logger.error("Checkout falhou após %.2fs", t.elapsed)
                 bug_logger.error("Stderr: %s", result.stderr[:500])
+                self.last_failure = f"checkout: {summarize_error(result.stderr)}"
                 return False, work_dir
 
             bug_logger.info("Checkout concluído em %.2fs", t.elapsed)
@@ -111,6 +145,7 @@ class CheckoutManager:
             if not result.success:
                 bug_logger.error("Compilação falhou após %.2fs", t.elapsed)
                 bug_logger.error("Stderr: %s", result.stderr[:500])
+                self.last_failure = f"compilação: {summarize_error(result.stderr)}"
                 return False, work_dir
 
             bug_logger.info("Compilação concluída em %.2fs", t.elapsed)

@@ -21,6 +21,7 @@ import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import List, Optional, Tuple
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -40,7 +41,7 @@ REPOS = {
 OUTPUT_PATH = DATA_PROCESSED_DIR / "bug_commit_dates.csv"
 
 
-def git_timestamp(repo: Path, revision: str) -> int | None:
+def git_timestamp(repo: Path, revision: str) -> Optional[int]:
     """Timestamp do committer da revisão, ou None se a revisão não existe."""
     result = subprocess.run(
         ["git", "--git-dir", str(repo), "show", "-s", "--format=%ct", revision],
@@ -54,7 +55,7 @@ def git_timestamp(repo: Path, revision: str) -> int | None:
     return int(line[-1]) if line and line[-1].isdigit() else None
 
 
-def svn_timestamp(repo: Path, revision: str) -> int | None:
+def svn_timestamp(repo: Path, revision: str) -> Optional[int]:
     """Timestamp de uma revisão SVN, lido direto do revprop do repositório FSFS.
 
     Evita depender do cliente svn, que não é requisito do Defects4J. O arquivo
@@ -87,11 +88,11 @@ def svn_timestamp(repo: Path, revision: str) -> int | None:
     return int(datetime.fromisoformat(stamp).astimezone(timezone.utc).timestamp())
 
 
-def commit_timestamp(repo: Path, revision: str, vcs: str) -> int | None:
+def commit_timestamp(repo: Path, revision: str, vcs: str) -> Optional[int]:
     return git_timestamp(repo, revision) if vcs == "git" else svn_timestamp(repo, revision)
 
 
-def active_bugs(project: str) -> list[tuple[int, str]]:
+def active_bugs(project: str) -> List[Tuple[int, str]]:
     path = DEFECTS4J_DIR / "framework" / "projects" / project / "active-bugs.csv"
     with open(path, encoding="utf-8") as f:
         return [
