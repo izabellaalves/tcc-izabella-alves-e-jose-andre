@@ -1,244 +1,357 @@
 strategy,project,bug,apfd,n_tests,n_trigger_tests
-Random,Chart,3,0.4472868217054263,86,1
-Random,Chart,5,0.4960045662100457,292,1
-Random,Chart,7,0.4395833333333333,16,1
-Random,Chart,9,0.5098958333333333,64,1
-Random,Chart,10,0.5,1,1
-Random,Chart,12,0.4502487562189055,201,1
-Random,Chart,14,0.8242774566473988,519,4
-Random,Chart,19,0.6768670309653916,366,2
-Random,Compress,3,0.4577235772357724,82,1
-Random,Compress,10,0.4752380952380953,35,1
-Random,Compress,13,0.658252427184466,103,2
-Random,Compress,15,0.5599358974358974,104,1
-Random,Compress,18,0.5072796934865901,174,1
-Random,Compress,21,0.9111111111111108,15,8
-Random,Compress,24,0.483879781420765,122,1
-Random,Compress,33,0.5547619047619048,42,1
-Random,Compress,34,0.4990867579908676,146,1
-Random,Compress,38,0.5396825396825397,126,1
-Random,Compress,41,0.6772575250836119,299,2
-Random,Compress,44,0.6892473118279571,31,3
-Random,Compress,47,0.5507448789571694,358,1
-Random,Lang,9,0.4477333333333335,125,1
-Random,Lang,11,0.4545454545454545,11,1
-Random,Lang,22,0.724,25,2
-Random,Lang,23,0.4916666666666666,8,1
-Random,Lang,31,0.6391710449503795,571,2
-Random,Lang,32,0.5133333333333333,45,1
-Random,Lang,34,0.9706280193236716,345,27
-Random,Lang,35,0.5414889167712255,797,1
-Random,Lang,36,0.6466666666666667,110,2
-Random,Lang,38,0.5666666666666667,59,1
-Random,Lang,42,0.5333333333333334,54,1
-Random,Lang,47,0.7354267310789051,207,2
-Random,Lang,51,0.4950877192982457,190,1
-Random,Lang,56,0.494949494949495,33,1
-Random,Lang,61,0.597117117117117,185,2
-Random,Lang,63,0.575,16,1
-Random,Lang,65,0.5466666666666667,30,1
-Random,Math,8,0.459090909090909,22,1
-Random,Math,9,0.5704761904761905,35,1
-Random,Math,11,0.4433333333333334,10,1
-Random,Math,17,0.5325757575757576,88,1
-Random,Math,18,0.494871794871795,26,1
-Random,Math,25,0.4523809523809524,7,1
-Random,Math,26,0.5414710485133021,213,1
-Random,Math,27,0.515962441314554,213,1
-Random,Math,28,0.5064102564102565,26,1
-Random,Math,33,0.5261904761904762,28,1
-Random,Math,37,0.8089887640449438,178,4
-Random,Math,40,0.4843621399176955,81,1
-Random,Math,43,0.7358490566037735,53,3
-Random,Math,46,0.6866180048661799,137,2
-Random,Math,50,0.475,4,1
-Random,Math,57,0.5222222222222223,3,1
-Random,Math,67,0.55,2,1
-Random,Math,69,0.4911111111111111,15,1
-Random,Math,70,0.49375,16,1
-Random,Math,73,0.5069288389513108,178,1
-Random,Math,75,0.4875,8,1
-Random,Math,88,0.5155555555555555,15,1
-Random,Math,89,0.5285714285714286,7,1
-Random,Math,95,0.5210526315789473,19,1
-Random,Math,99,0.6215,400,2
-Random,Math,102,0.8411764705882352,17,4
-Random,Math,103,0.5777777777777778,12,1
-Random,Math,105,0.3925925925925926,9,1
-Random,Mockito,1,0.951604668125456,914,19
-Random,Mockito,3,0.9075209930631618,913,8
-Random,Mockito,4,0.8140517696777603,1262,4
-Random,Mockito,12,0.9250000000000002,20,10
-Random,Mockito,18,0.5037421383647799,1060,1
-Random,Mockito,21,0.6254901960784315,17,1
-Random,Mockito,26,0.7379823337982335,717,2
-Random,Mockito,32,0.3570540935672515,912,1
-Random,Time,4,0.5622077922077923,770,1
-Random,Time,5,0.778068376068376,1950,3
-Random,Time,8,0.4398818565400843,3950,1
-Random,Time,20,0.5618548700038805,2577,1
-Random,Time,22,0.6268266666666668,1875,2
-Random,Time,24,0.890494540783558,1038,7
-Random,Time,26,0.9142027455121438,3788,8
-History-based,Chart,3,0.6569767441860466,86,1
-History-based,Chart,5,0.857876712328767,292,1
+Random,Chart,1,0.5068042813,436,1
+Random,Chart,2,0.6863063063,555,2
+Random,Chart,3,0.4674418605,86,1
+Random,Chart,4,0.9504253674,431,22
+Random,Chart,5,0.5142694064,292,1
+Random,Chart,6,0.7765432099,486,2
+Random,Chart,7,0.5,16,1
+Random,Chart,8,0.447826087,23,1
+Random,Compress,34,0.5210290828,149,1
+Random,Compress,35,0.5766666667,140,1
+Random,Compress,36,0.4333333333,103,1
+Random,Compress,37,0.5442967885,301,1
+Random,Compress,38,0.557881137,129,1
+Random,Compress,39,0.5595833333,160,1
+Random,Compress,40,0.7126666667,50,2
+Random,Compress,41,0.6572510823,308,2
+Random,Compress,42,0.4857988166,169,1
+Random,Compress,43,0.4892575039,422,1
+Random,Compress,44,0.7432098765,54,3
+Random,Compress,45,0.4878995434,146,1
+Random,Compress,46,0.45913371,177,1
+Random,Compress,47,0.544695071,399,1
+Random,Lang,1,0.5325626204,173,1
+Random,Lang,3,0.5812015504,172,1
+Random,Lang,4,0.4912408759,137,1
+Random,Lang,5,0.6230769231,13,1
+Random,Lang,6,0.4516431925,142,1
+Random,Lang,7,0.4841365462,166,1
+Random,Lang,8,0.6632034632,154,2
+Random,Lang,9,0.6913131313,165,2
+Random,Lang,10,0.6390593047,163,2
+Random,Lang,11,0.4545454545,11,1
+Random,Lang,12,0.6766666667,10,2
+Random,Lang,13,0.5560897436,208,1
+Random,Lang,14,0.5435651479,834,1
+Random,Lang,15,0.6866666667,10,2
+Random,Lang,16,0.4571138211,164,1
+Random,Lang,17,0.4785185185,45,1
+Random,Lang,19,0.646875,32,2
+Random,Lang,20,0.6447293447,585,2
+Random,Math,1,0.675399361,313,2
+Random,Math,2,0.575,16,1
+Random,Math,3,0.4387701363,2152,1
+Random,Math,4,0.6224358974,52,2
+Random,Math,5,0.485620915,255,1
+Random,Math,6,0.9723188406,230,28
+Random,Math,7,0.4731755424,169,1
+Random,Math,8,0.4803030303,22,1
+Random,Math,9,0.4876190476,35,1
+Random,Math,10,0.4795289855,368,1
+Random,Math,11,0.4433333333,10,1
+Random,Math,12,0.6860047281,705,3
+Random,Math,13,0.5325757576,88,1
+Random,Math,14,0.4800724638,92,1
+Random,Math,15,0.3820555556,3000,1
+Random,Math,16,0.6884700912,2998,2
+Random,Math,17,0.4180076628,87,1
+Random,Math,18,0.4474358974,26,1
+Random,Math,19,0.4466666667,25,1
+Random,Math,20,0.5416666667,24,1
+Random,Math,21,0.6444444444,24,2
+Random,Math,22,0.6608843537,98,2
+Random,Math,23,0.5137254902,17,1
+Random,Math,24,0.5854166667,16,1
+Random,Math,25,0.5523809524,7,1
+Random,Math,26,0.5428794992,213,1
+Random,Math,27,0.5164319249,213,1
+Random,Math,28,0.4551282051,26,1
+Random,Math,29,0.7820512821,78,3
+Random,Math,30,0.4777777778,3,1
+Random,Math,31,0.6902208202,317,2
+Random,Math,32,0.5492753623,23,1
+Random,Mockito,1,0.9599652778,960,26
+Random,Mockito,2,0.7433333333,30,3
+Random,Mockito,3,0.8980555556,960,9
+Random,Mockito,4,0.813755403,1311,4
+Random,Mockito,5,0.516,25,1
+Random,Mockito,6,0.8992326581,1086,7
+Random,Mockito,18,0.4673893406,1107,1
+Random,Mockito,19,0.523089983,1178,1
+Random,Mockito,20,0.8925102249,1304,8
+Random,Time,1,0.5307653952,4011,1
+Random,Time,2,0.5339399983,4011,1
+Random,Time,3,0.8565416985,1307,5
+Random,Time,4,0.5378354978,770,1
+Random,Time,5,0.8021538462,1950,3
+Random,Time,6,0.8270371761,2663,5
+Random,Time,7,0.6481563695,2703,2
+Random,Time,9,0.4179831224,3950,1
+History-based,Chart,1,0.8360091743,436,1
+History-based,Chart,2,0.8333333333,555,2
+History-based,Chart,3,0.6104651163,86,1
+History-based,Chart,4,0.8921113689,431,22
+History-based,Chart,5,0.9195205479,292,1
+History-based,Chart,6,0.5174897119,486,2
 History-based,Chart,7,0.40625,16,1
-History-based,Chart,9,0.8046875,64,1
-History-based,Chart,10,0.5,1,1
-History-based,Chart,12,0.6940298507462688,201,1
-History-based,Chart,14,0.2591522157996146,519,4
-History-based,Chart,19,0.4494535519125683,366,2
-History-based,Compress,3,0.4329268292682927,82,1
-History-based,Compress,10,0.2428571428571428,35,1
-History-based,Compress,13,0.0922330097087378,103,2
-History-based,Compress,15,0.3028846153846154,104,1
-History-based,Compress,18,0.0660919540229884,174,1
-History-based,Compress,21,0.7666666666666667,15,8
-History-based,Compress,24,0.3565573770491803,122,1
-History-based,Compress,33,0.5357142857142857,42,1
-History-based,Compress,34,0.3253424657534246,146,1
-History-based,Compress,38,0.7817460317460317,126,1
-History-based,Compress,41,0.3862876254180601,299,2
-History-based,Compress,44,0.467741935483871,31,3
-History-based,Compress,47,0.8421787709497207,358,1
-History-based,Lang,9,0.628,125,1
-History-based,Lang,11,0.6818181818181818,11,1
-History-based,Lang,22,0.18,25,2
-History-based,Lang,23,0.5625,8,1
-History-based,Lang,31,0.9115586690017514,571,2
-History-based,Lang,32,0.1222222222222222,45,1
-History-based,Lang,34,0.381159420289855,345,27
-History-based,Lang,35,0.5564617314930991,797,1
-History-based,Lang,36,0.9954545454545456,110,2
-History-based,Lang,38,0.652542372881356,59,1
-History-based,Lang,42,0.675925925925926,54,1
-History-based,Lang,47,0.3405797101449275,207,2
-History-based,Lang,51,0.0973684210526315,190,1
-History-based,Lang,56,0.4393939393939393,33,1
-History-based,Lang,61,0.4351351351351351,185,2
-History-based,Lang,63,0.34375,16,1
-History-based,Lang,65,0.0499999999999999,30,1
-History-based,Math,8,0.2045454545454545,22,1
-History-based,Math,9,0.2142857142857142,35,1
-History-based,Math,11,0.1499999999999999,10,1
-History-based,Math,17,0.3352272727272727,88,1
-History-based,Math,18,0.5961538461538461,26,1
-History-based,Math,25,0.6428571428571428,7,1
-History-based,Math,26,0.5657276995305165,213,1
-History-based,Math,27,0.5187793427230047,213,1
-History-based,Math,28,0.3269230769230769,26,1
-History-based,Math,33,0.3749999999999999,28,1
-History-based,Math,37,0.148876404494382,178,4
-History-based,Math,40,0.4382716049382716,81,1
-History-based,Math,43,0.4622641509433962,53,3
-History-based,Math,46,0.843065693430657,137,2
-History-based,Math,50,0.875,4,1
-History-based,Math,57,0.1666666666666666,3,1
-History-based,Math,67,0.75,2,1
-History-based,Math,69,0.3,15,1
-History-based,Math,70,0.90625,16,1
-History-based,Math,73,0.8567415730337078,178,1
-History-based,Math,75,0.3125,8,1
-History-based,Math,88,0.7000000000000001,15,1
-History-based,Math,89,0.6428571428571428,7,1
-History-based,Math,95,0.1842105263157895,19,1
-History-based,Math,99,0.98625,400,2
-History-based,Math,102,0.9705882352941176,17,4
-History-based,Math,103,0.9583333333333331,12,1
-History-based,Math,105,0.0555555555555555,9,1
-History-based,Mockito,1,0.9797592997811816,914,19
-History-based,Mockito,3,0.9545454545454546,913,8
-History-based,Mockito,4,0.9536450079239304,1262,4
-History-based,Mockito,12,0.875,20,10
-History-based,Mockito,18,0.0948113207547169,1060,1
-History-based,Mockito,21,0.5588235294117647,17,1
-History-based,Mockito,26,0.105299860529986,717,2
-History-based,Mockito,32,0.3908991228070175,912,1
-History-based,Time,4,0.1668831168831169,770,1
-History-based,Time,5,0.5258974358974359,1950,3
-History-based,Time,8,0.7218987341772152,3950,1
-History-based,Time,20,0.008731082654249,2577,1
-History-based,Time,22,0.8338666666666666,1875,2
-History-based,Time,24,0.2894990366088631,1038,7
-History-based,Time,26,0.9753167898627244,3788,8
-Random Forest,Chart,3,0.6569767441860466,86,1
-Random Forest,Chart,5,0.857876712328767,292,1
+History-based,Chart,8,0.8913043478,23,1
+History-based,Compress,34,0.3187919463,149,1
+History-based,Compress,35,0.6821428571,140,1
+History-based,Compress,36,0.8106796117,103,1
+History-based,Compress,37,0.8222591362,301,1
+History-based,Compress,38,0.7635658915,129,1
+History-based,Compress,39,0.790625,160,1
+History-based,Compress,40,0.91,50,2
+History-based,Compress,41,0.375,308,2
+History-based,Compress,42,0.8550295858,169,1
+History-based,Compress,43,0.8518957346,422,1
+History-based,Compress,44,0.2685185185,54,3
+History-based,Compress,45,0.2020547945,146,1
+History-based,Compress,46,0.4661016949,177,1
+History-based,Compress,47,0.835839599,399,1
+History-based,Lang,1,0.9797687861,173,1
+History-based,Lang,3,0.375,172,1
+History-based,Lang,4,0.4124087591,137,1
+History-based,Lang,5,0.5,13,1
+History-based,Lang,6,0.6302816901,142,1
+History-based,Lang,7,0.9969879518,166,1
+History-based,Lang,8,0.9123376623,154,2
+History-based,Lang,9,0.6818181818,165,2
+History-based,Lang,10,0.6901840491,163,2
+History-based,Lang,11,0.6818181818,11,1
+History-based,Lang,12,0.85,10,2
+History-based,Lang,13,0.1995192308,208,1
+History-based,Lang,14,0.7547961631,834,1
+History-based,Lang,15,0.55,10,2
+History-based,Lang,16,0.9969512195,164,1
+History-based,Lang,17,0.2777777778,45,1
+History-based,Lang,19,0.296875,32,2
+History-based,Lang,20,0.5735042735,585,2
+History-based,Math,1,0.8099041534,313,2
+History-based,Math,2,0.34375,16,1
+History-based,Math,3,0.4593401487,2152,1
+History-based,Math,4,0.4326923077,52,2
+History-based,Math,5,0.3705882353,255,1
+History-based,Math,6,0.9847826087,230,28
+History-based,Math,7,0.5414201183,169,1
+History-based,Math,8,0.2045454545,22,1
+History-based,Math,9,0.2142857143,35,1
+History-based,Math,10,0.9660326087,368,1
+History-based,Math,11,0.15,10,1
+History-based,Math,12,0.6645390071,705,3
+History-based,Math,13,0.6306818182,88,1
+History-based,Math,14,0.6467391304,92,1
+History-based,Math,15,0.4751666667,3000,1
+History-based,Math,16,0.4758172115,2998,2
+History-based,Math,17,0.3390804598,87,1
+History-based,Math,18,0.5576923077,26,1
+History-based,Math,19,0.86,25,1
+History-based,Math,20,0.3958333333,24,1
+History-based,Math,21,0.4791666667,24,2
+History-based,Math,22,0.4540816327,98,2
+History-based,Math,23,0.7941176471,17,1
+History-based,Math,24,0.78125,16,1
+History-based,Math,25,0.6428571429,7,1
+History-based,Math,26,0.5610328638,213,1
+History-based,Math,27,0.5187793427,213,1
+History-based,Math,28,0.3269230769,26,1
+History-based,Math,29,0.6474358974,78,3
+History-based,Math,30,0.8333333333,3,1
+History-based,Math,31,0.4085173502,317,2
+History-based,Math,32,0.4130434783,23,1
+History-based,Mockito,1,0.9401041667,960,26
+History-based,Mockito,2,0.15,30,3
+History-based,Mockito,3,0.9119791667,960,9
+History-based,Mockito,4,0.9401220442,1311,4
+History-based,Mockito,5,0.94,25,1
+History-based,Mockito,6,0.9673112339,1086,7
+History-based,Mockito,18,0.086269196,1107,1
+History-based,Mockito,19,0.6311544992,1178,1
+History-based,Mockito,20,0.9528374233,1304,8
+History-based,Time,1,0.9402892047,4011,1
+History-based,Time,2,0.1467215158,4011,1
+History-based,Time,3,0.967482785,1307,5
+History-based,Time,4,0.1668831169,770,1
+History-based,Time,5,0.5187179487,1950,3
+History-based,Time,6,0.0407435223,2663,5
+History-based,Time,7,0.496300407,2703,2
+History-based,Time,9,0.9953164557,3950,1
+same_package,Chart,1,0.9644495413,436,1
+same_package,Chart,2,0.9306306306,555,2
+same_package,Chart,3,0.6569767442,86,1
+same_package,Chart,4,0.9408352668,431,22
+same_package,Chart,5,0.926369863,292,1
+same_package,Chart,6,0.5339506173,486,2
+same_package,Chart,7,0.40625,16,1
+same_package,Chart,8,0.8913043478,23,1
+same_package,Compress,34,0.7751677852,149,1
+same_package,Compress,35,0.4035714286,140,1
+same_package,Compress,36,0.9854368932,103,1
+same_package,Compress,37,0.9551495017,301,1
+same_package,Compress,38,0.8875968992,129,1
+same_package,Compress,39,0.921875,160,1
+same_package,Compress,40,0.99,50,2
+same_package,Compress,41,0.9301948052,308,2
+same_package,Compress,42,0.9852071006,169,1
+same_package,Compress,43,0.9917061611,422,1
+same_package,Compress,44,0.9907407407,54,3
+same_package,Compress,45,0.6815068493,146,1
+same_package,Compress,46,0.8107344633,177,1
+same_package,Compress,47,0.9887218045,399,1
+same_package,Lang,1,0.9971098266,173,1
+same_package,Lang,3,0.601744186,172,1
+same_package,Lang,4,0.9890510949,137,1
+same_package,Lang,5,0.5,13,1
+same_package,Lang,6,0.6373239437,142,1
+same_package,Lang,7,0.936746988,166,1
+same_package,Lang,8,0.9318181818,154,2
+same_package,Lang,9,0.6818181818,165,2
+same_package,Lang,10,0.6901840491,163,2
+same_package,Lang,11,0.6818181818,11,1
+same_package,Lang,12,0.85,10,2
+same_package,Lang,13,0.5600961538,208,1
+same_package,Lang,14,0.8986810552,834,1
+same_package,Lang,15,0.55,10,2
+same_package,Lang,16,0.9359756098,164,1
+same_package,Lang,17,0.1888888889,45,1
+same_package,Lang,19,0.984375,32,2
+same_package,Lang,20,0.6811965812,585,2
+same_package,Math,1,0.9568690096,313,2
+same_package,Math,2,0.34375,16,1
+same_package,Math,3,0.9616635688,2152,1
+same_package,Math,4,0.4519230769,52,2
+same_package,Math,5,0.4843137255,255,1
+same_package,Math,6,0.9934782609,230,28
+same_package,Math,7,0.4940828402,169,1
+same_package,Math,8,0.2045454545,22,1
+same_package,Math,9,0.2142857143,35,1
+same_package,Math,10,0.9850543478,368,1
+same_package,Math,11,0.15,10,1
+same_package,Math,12,0.680141844,705,3
+same_package,Math,13,0.2215909091,88,1
+same_package,Math,14,0.222826087,92,1
+same_package,Math,15,0.9578333333,3000,1
+same_package,Math,16,0.9578052035,2998,2
+same_package,Math,17,0.7873563218,87,1
+same_package,Math,18,0.5961538462,26,1
+same_package,Math,19,0.9,25,1
+same_package,Math,20,0.3958333333,24,1
+same_package,Math,21,0.9375,24,2
+same_package,Math,22,0.8214285714,98,2
+same_package,Math,23,0.8529411765,17,1
+same_package,Math,24,0.78125,16,1
+same_package,Math,25,0.6428571429,7,1
+same_package,Math,26,0.8943661972,213,1
+same_package,Math,27,0.8802816901,213,1
+same_package,Math,28,0.3269230769,26,1
+same_package,Math,29,0.6474358974,78,3
+same_package,Math,30,0.8333333333,3,1
+same_package,Math,31,0.4085173502,317,2
+same_package,Math,32,0.0652173913,23,1
+same_package,Mockito,1,0.9651041667,960,26
+same_package,Mockito,2,0.9166666667,30,3
+same_package,Mockito,3,0.9640625,960,9
+same_package,Mockito,4,0.9996186117,1311,4
+same_package,Mockito,5,0.78,25,1
+same_package,Mockito,6,0.9857274401,1086,7
+same_package,Mockito,18,0.9859981933,1107,1
+same_package,Mockito,19,0.6498302207,1178,1
+same_package,Mockito,20,0.9781441718,1304,8
+same_package,Time,1,0.9634754425,4011,1
+same_package,Time,2,0.3132635253,4011,1
+same_package,Time,3,0.9965570008,1307,5
+same_package,Time,4,0.2980519481,770,1
+same_package,Time,5,0.6038461538,1950,3
+same_package,Time,6,0.9780322944,2663,5
+same_package,Time,7,0.9324824269,2703,2
+same_package,Time,9,0.7598734177,3950,1
+Random Forest,Chart,1,0.8360091743,436,1
+Random Forest,Chart,2,0.8333333333,555,2
+Random Forest,Chart,3,0.6104651163,86,1
+Random Forest,Chart,4,0.8921113689,431,22
+Random Forest,Chart,5,0.9195205479,292,1
+Random Forest,Chart,6,0.5174897119,486,2
 Random Forest,Chart,7,0.40625,16,1
-Random Forest,Chart,9,0.8359375,64,1
-Random Forest,Chart,10,0.5,1,1
-Random Forest,Chart,12,0.8034825870646767,201,1
-Random Forest,Chart,14,0.3015414258188824,519,4
-Random Forest,Chart,19,0.5095628415300546,366,2
-Random Forest,Compress,3,0.4451219512195121,82,1
-Random Forest,Compress,10,0.6714285714285714,35,1
-Random Forest,Compress,13,0.8106796116504854,103,2
-Random Forest,Compress,15,0.9567307692307692,104,1
-Random Forest,Compress,18,0.9224137931034484,174,1
-Random Forest,Compress,21,0.7666666666666667,15,8
-Random Forest,Compress,24,0.971311475409836,122,1
-Random Forest,Compress,33,0.5357142857142857,42,1
-Random Forest,Compress,34,0.9828767123287672,146,1
-Random Forest,Compress,38,0.8690476190476191,126,1
-Random Forest,Compress,41,0.991638795986622,299,2
-Random Forest,Compress,44,0.9838709677419356,31,3
-Random Forest,Compress,47,0.9902234636871508,358,1
-Random Forest,Lang,9,0.964,125,1
-Random Forest,Lang,11,0.6818181818181818,11,1
-Random Forest,Lang,22,0.18,25,2
-Random Forest,Lang,23,0.5625,8,1
-Random Forest,Lang,31,0.6155866900175132,571,2
-Random Forest,Lang,32,0.211111111111111,45,1
-Random Forest,Lang,34,0.1637681159420289,345,27
-Random Forest,Lang,35,0.2616060225846925,797,1
-Random Forest,Lang,36,0.5499999999999999,110,2
-Random Forest,Lang,38,0.9576271186440678,59,1
-Random Forest,Lang,42,0.5092592592592593,54,1
-Random Forest,Lang,47,0.8091787439613527,207,2
-Random Forest,Lang,51,0.8657894736842106,190,1
-Random Forest,Lang,56,0.9545454545454546,33,1
-Random Forest,Lang,61,0.8405405405405405,185,2
-Random Forest,Lang,63,0.40625,16,1
-Random Forest,Lang,65,0.3166666666666667,30,1
-Random Forest,Math,8,0.2045454545454545,22,1
-Random Forest,Math,9,0.8428571428571427,35,1
-Random Forest,Math,11,0.55,10,1
-Random Forest,Math,17,0.8238636363636364,88,1
-Random Forest,Math,18,0.5961538461538461,26,1
-Random Forest,Math,25,0.6428571428571428,7,1
-Random Forest,Math,26,0.9272300469483568,213,1
-Random Forest,Math,27,0.9178403755868544,213,1
-Random Forest,Math,28,0.3269230769230769,26,1
-Random Forest,Math,33,0.3035714285714285,28,1
-Random Forest,Math,37,0.3567415730337078,178,4
-Random Forest,Math,40,0.9197530864197532,81,1
-Random Forest,Math,43,0.8962264150943396,53,3
-Random Forest,Math,46,0.9014598540145986,137,2
-Random Forest,Math,50,0.875,4,1
-Random Forest,Math,57,0.1666666666666666,3,1
-Random Forest,Math,67,0.75,2,1
-Random Forest,Math,69,0.6333333333333333,15,1
-Random Forest,Math,70,0.90625,16,1
-Random Forest,Math,73,0.997191011235955,178,1
-Random Forest,Math,75,0.3125,8,1
-Random Forest,Math,88,0.5,15,1
-Random Forest,Math,89,0.7857142857142857,7,1
-Random Forest,Math,95,0.7631578947368421,19,1
-Random Forest,Math,99,0.95375,400,2
-Random Forest,Math,102,0.9705882352941176,17,4
-Random Forest,Math,103,0.0416666666666666,12,1
-Random Forest,Math,105,0.0555555555555555,9,1
-Random Forest,Mockito,1,0.9797592997811816,914,19
-Random Forest,Mockito,3,0.9950711938663748,913,8
-Random Forest,Mockito,4,0.1905705229793978,1262,4
-Random Forest,Mockito,12,0.975,20,10
-Random Forest,Mockito,18,0.9995283018867924,1060,1
-Random Forest,Mockito,21,0.9117647058823528,17,1
-Random Forest,Mockito,26,0.1499302649930265,717,2
-Random Forest,Mockito,32,0.4205043859649122,912,1
-Random Forest,Time,4,0.7733766233766234,770,1
-Random Forest,Time,5,0.9402564102564102,1950,3
-Random Forest,Time,8,0.9981012658227848,3950,1
-Random Forest,Time,20,0.992045013581684,2577,1
-Random Forest,Time,22,0.8338666666666666,1875,2
-Random Forest,Time,24,0.0871868978805395,1038,7
-Random Forest,Time,26,0.8140179514255544,3788,8
+Random Forest,Chart,8,0.8913043478,23,1
+Random Forest,Compress,34,0.7080536913,149,1
+Random Forest,Compress,35,0.3821428571,140,1
+Random Forest,Compress,36,0.8980582524,103,1
+Random Forest,Compress,37,0.9418604651,301,1
+Random Forest,Compress,38,0.8565891473,129,1
+Random Forest,Compress,39,0.796875,160,1
+Random Forest,Compress,40,0.99,50,2
+Random Forest,Compress,41,0.9107142857,308,2
+Random Forest,Compress,42,0.9852071006,169,1
+Random Forest,Compress,43,0.9443127962,422,1
+Random Forest,Compress,44,0.9907407407,54,3
+Random Forest,Compress,45,0.6678082192,146,1
+Random Forest,Compress,46,0.7316384181,177,1
+Random Forest,Compress,47,0.9536340852,399,1
+Random Forest,Lang,1,0.9797687861,173,1
+Random Forest,Lang,3,0.601744186,172,1
+Random Forest,Lang,4,0.9890510949,137,1
+Random Forest,Lang,5,0.5,13,1
+Random Forest,Lang,6,0.6021126761,142,1
+Random Forest,Lang,7,0.9969879518,166,1
+Random Forest,Lang,8,0.9123376623,154,2
+Random Forest,Lang,9,0.6818181818,165,2
+Random Forest,Lang,10,0.6901840491,163,2
+Random Forest,Lang,11,0.6818181818,11,1
+Random Forest,Lang,12,0.85,10,2
+Random Forest,Lang,13,0.5600961538,208,1
+Random Forest,Lang,14,0.8878896882,834,1
+Random Forest,Lang,15,0.55,10,2
+Random Forest,Lang,16,0.9969512195,164,1
+Random Forest,Lang,17,0.1888888889,45,1
+Random Forest,Lang,19,0.953125,32,2
+Random Forest,Lang,20,0.6777777778,585,2
+Random Forest,Math,1,0.9568690096,313,2
+Random Forest,Math,2,0.34375,16,1
+Random Forest,Math,3,0.9616635688,2152,1
+Random Forest,Math,4,0.4519230769,52,2
+Random Forest,Math,5,0.4843137255,255,1
+Random Forest,Math,6,0.9934782609,230,28
+Random Forest,Math,7,0.4940828402,169,1
+Random Forest,Math,8,0.2045454545,22,1
+Random Forest,Math,9,0.2142857143,35,1
+Random Forest,Math,10,0.9850543478,368,1
+Random Forest,Math,11,0.15,10,1
+Random Forest,Math,12,0.6645390071,705,3
+Random Forest,Math,13,0.2102272727,88,1
+Random Forest,Math,14,0.222826087,92,1
+Random Forest,Math,15,0.9571666667,3000,1
+Random Forest,Math,16,0.9578052035,2998,2
+Random Forest,Math,17,0.7873563218,87,1
+Random Forest,Math,18,0.5576923077,26,1
+Random Forest,Math,19,0.86,25,1
+Random Forest,Math,20,0.3958333333,24,1
+Random Forest,Math,21,0.9375,24,2
+Random Forest,Math,22,0.8214285714,98,2
+Random Forest,Math,23,0.7941176471,17,1
+Random Forest,Math,24,0.78125,16,1
+Random Forest,Math,25,0.6428571429,7,1
+Random Forest,Math,26,0.8896713615,213,1
+Random Forest,Math,27,0.8802816901,213,1
+Random Forest,Math,28,0.3269230769,26,1
+Random Forest,Math,29,0.6474358974,78,3
+Random Forest,Math,30,0.8333333333,3,1
+Random Forest,Math,31,0.4085173502,317,2
+Random Forest,Math,32,0.0652173913,23,1
+Random Forest,Mockito,1,0.9651041667,960,26
+Random Forest,Mockito,2,0.9166666667,30,3
+Random Forest,Mockito,3,0.9640625,960,9
+Random Forest,Mockito,4,0.9996186117,1311,4
+Random Forest,Mockito,5,0.78,25,1
+Random Forest,Mockito,6,0.9581031308,1086,7
+Random Forest,Mockito,18,0.9814814815,1107,1
+Random Forest,Mockito,19,0.6676570458,1178,1
+Random Forest,Mockito,20,0.9520705521,1304,8
+Random Forest,Time,1,0.9654699576,4011,1
+Random Forest,Time,2,0.3234854151,4011,1
+Random Forest,Time,3,0.980489671,1307,5
+Random Forest,Time,4,0.2980519481,770,1
+Random Forest,Time,5,0.5966666667,1950,3
+Random Forest,Time,6,0.9780322944,2663,5
+Random Forest,Time,7,0.9273029967,2703,2
+Random Forest,Time,9,0.9958227848,3950,1

@@ -4,12 +4,40 @@ import csv
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Sequence, Tuple
 
 from src.defects4j.wrapper import Defects4JWrapper
 from src.utils.environment import EnvironmentConfig
 from src.utils.helpers import Timer
 from src.utils.logger import BugProcessingLogger, get_logger
+
+
+def summarize_error(stderr: str) -> str:
+    """Resume o stderr do Defects4J numa linha utilizável num CSV.
+
+    Prefere as linhas que dizem o que deu errado de fato (um patch que não
+    aplica, um diretório ausente) à moldura de stack trace do Perl.
+    """
+    if not stderr:
+        return "sem stderr"
+
+    interesting = []
+    for line in stderr.splitlines():
+        line = line.strip()
+        if not line or line.startswith(("at /", "\tVcs::", "\tProject::", "---")):
+            continue
+        if any(
+            key in line
+            for key in ("error:", "No such file", "does not exist", "BUILD FAILED",
+                        "Cannot ", "cannot ", "failed", "FAIL")
+        ):
+            interesting.append(line)
+
+    if not interesting:
+        interesting = [ln.strip() for ln in stderr.splitlines() if ln.strip()][:2]
+
+    summary = "; ".join(interesting[:3])
+    return summary[:300].replace("\n", " ").replace(",", ";")
 
 
 @dataclass
@@ -33,6 +61,10 @@ class CheckoutManager:
         self.wrapper = Defects4JWrapper(config)
         self.logger = get_logger()
         self.data_dir.mkdir(parents=True, exist_ok=True)
+        # Motivo da última falha, para quem registra o resultado por bug. Sem
+        # isso o relatório só sabe dizer "checkout ou compilação", o que não
+        # distingue uma falha real do framework de um bug não tentado.
+        self.last_failure: str = ""
 
     def read_active_bugs(self, project: str) -> List[int]:
         """Lê IDs de bugs ativos de um projeto."""
@@ -83,6 +115,7 @@ class CheckoutManager:
     ) -> Tuple[bool, Path]:
         """Faz checkout e compilação de um bug."""
         work_dir = self.get_bug_work_dir(project, bug_id)
+        self.last_failure = ""
 
         with BugProcessingLogger(self.logger, project, bug_id) as bug_logger:
             if skip_if_exists and self.is_bug_checked_out(work_dir):
@@ -100,6 +133,7 @@ class CheckoutManager:
             if not result.success:
                 bug_logger.error("Checkout falhou após %.2fs", t.elapsed)
                 bug_logger.error("Stderr: %s", result.stderr[:500])
+                self.last_failure = f"checkout: {summarize_error(result.stderr)}"
                 return False, work_dir
 
             bug_logger.info("Checkout concluído em %.2fs", t.elapsed)
@@ -111,6 +145,7 @@ class CheckoutManager:
             if not result.success:
                 bug_logger.error("Compilação falhou após %.2fs", t.elapsed)
                 bug_logger.error("Stderr: %s", result.stderr[:500])
+                self.last_failure = f"compilação: {summarize_error(result.stderr)}"
                 return False, work_dir
 
             bug_logger.info("Compilação concluída em %.2fs", t.elapsed)
@@ -172,3 +207,41 @@ class CheckoutManager:
         self.logger.info("Projetos: %s", ", ".join(projects))
 
         return all_bugs
+
+    def process_bugs(
+        self,
+        bugs: Sequence[Tuple[str, int]],
+        skip_if_exists: bool = False,
+    ) -> List[BugInfo]:
+        if not bugs:
+            self.logger.error("Nenhum bug informado para processar")
+            return []
+
+        self.logger.info("Processando %d bug(s) específico(s)", len(bugs))
+
+        successful_bugs = []
+        failed_bugs = []
+
+        for i, (project, bug_id) in enumerate(bugs, 1):
+            self.logger.info("Progresso: %d/%d — %s-%s", i, len(bugs), project, bug_id)
+            success, work_dir = self.checkout_and_compile(
+                project,
+                bug_id,
+                skip_if_exists=skip_if_exists,
+            )
+            if success:
+                successful_bugs.append(BugInfo(project, bug_id, work_dir))
+            else:
+                failed_bugs.append((project, bug_id))
+
+        self.logger.info(
+            "Resumo bugs específicos: sucesso %d/%d",
+            len(successful_bugs),
+            len(bugs),
+        )
+        if failed_bugs:
+            self.logger.warning("Falharam %d bug(s):", len(failed_bugs))
+            for proj, bid in failed_bugs:
+                self.logger.warning("  - %s-%s", proj, bid)
+
+        return successful_bugs
