@@ -135,6 +135,22 @@ Execute na raiz do projeto, nesta ordem. Pode ser dentro ou fora do container
    python3 -m src.ml.ablation
    ```
 
+## Métricas de classificação e figuras
+
+Rodam depois dos passos 5 (Random Forest, incluindo a execução `roc_auc`) e 6 (consolidação).
+Usam os modelos salvos e o split existente, sem retreinar nem recalcular APFD.
+
+```bash
+# Precision/Recall/F1 (limiar 0,5) e AUC-ROC dos dois modelos, geral e por projeto
+python3 -m src.metrics.classification_metrics
+# Boxplots do APFD por bug (geral e por projeto), em PDF e PNG 300 dpi
+python3 -m src.visualization.plot_apfd
+```
+
+Geram `results/classification_metrics.csv`, `results/auc_metrics.csv` e `results/figures/`.
+Precision, Recall e F1 só existem para o Random Forest: Random, History-based e Same-Package
+ordenam testes e não fazem classificação binária.
+
 ## Split treino/teste
 
 - Split **por bug**: todas as instâncias de um bug ficam do mesmo lado.

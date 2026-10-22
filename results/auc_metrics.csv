@@ -1,0 +1,3 @@
+modelo,min_samples_leaf,cv_auc_mean,cv_auc_std,cv,test_auc,test
+"Random Forest (F1, oficial)",1,0.6917,0.0702,"GroupKFold(5) por project+bug, no treino",0.6316,"por instância, 89 bugs de teste"
+"Random Forest (AUC-ROC, alternativo)",5,0.6925,0.0689,"GroupKFold(5) por project+bug, no treino",0.6316,"por instância, 89 bugs de teste"

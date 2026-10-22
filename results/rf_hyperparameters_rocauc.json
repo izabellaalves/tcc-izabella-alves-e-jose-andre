@@ -1,0 +1,15 @@
+{
+  "best_params": {
+    "max_depth": null,
+    "min_samples_leaf": 5,
+    "min_samples_split": 2,
+    "n_estimators": 100
+  },
+  "cv_best_roc_auc": 0.6924932298881629,
+  "scoring": "roc_auc",
+  "cv": "GroupKFold(5, grouped by project+bug)",
+  "fixed_params": {
+    "class_weight": "balanced",
+    "random_state": 42
+  }
+}

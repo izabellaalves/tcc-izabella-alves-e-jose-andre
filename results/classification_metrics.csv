@@ -1,0 +1,15 @@
+modelo,escopo,precision,recall,f1,tp,fp,fn,tn,n_positivos,n_instancias,n_bugs
+"Random Forest (F1, oficial)",Geral,0.0067,0.5631,0.0132,125,18542,97,30480,222,49244,89
+"Random Forest (F1, oficial)",Lang,0.0119,0.92,0.0235,23,1910,2,1249,25,3184,18
+"Random Forest (F1, oficial)",Chart,0.0,0.0,0.0,0,0,31,2294,31,2325,8
+"Random Forest (F1, oficial)",Math,0.0348,0.8696,0.0669,60,1666,9,9967,69,11702,32
+"Random Forest (F1, oficial)",Time,0.0015,1.0,0.0029,19,13016,0,8330,19,21365,8
+"Random Forest (F1, oficial)",Mockito,0.0063,0.1333,0.012,8,1267,52,6634,60,7961,9
+"Random Forest (F1, oficial)",Compress,0.0215,0.8333,0.0419,15,683,3,2006,18,2707,14
+"Random Forest (AUC-ROC, alternativo)",Geral,0.0067,0.5631,0.0132,125,18542,97,30480,222,49244,89
+"Random Forest (AUC-ROC, alternativo)",Lang,0.0119,0.92,0.0235,23,1910,2,1249,25,3184,18
+"Random Forest (AUC-ROC, alternativo)",Chart,0.0,0.0,0.0,0,0,31,2294,31,2325,8
+"Random Forest (AUC-ROC, alternativo)",Math,0.0348,0.8696,0.0669,60,1666,9,9967,69,11702,32
+"Random Forest (AUC-ROC, alternativo)",Time,0.0015,1.0,0.0029,19,13016,0,8330,19,21365,8
+"Random Forest (AUC-ROC, alternativo)",Mockito,0.0063,0.1333,0.012,8,1267,52,6634,60,7961,9
+"Random Forest (AUC-ROC, alternativo)",Compress,0.0215,0.8333,0.0419,15,683,3,2006,18,2707,14
